@@ -1,8 +1,0 @@
-************* Module app
-app.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-app.py:13:0: C0116: Missing function or method docstring (missing-function-docstring)
-app.py:14:4: W0621: Redefining name 'app' from outer scope (line 31) (redefined-outer-name)
-
-------------------------------------------------------------------
-Your code has been rated at 8.80/10 (previous run: 8.80/10, +0.00)
-

@@ -1,7 +1,7 @@
 import logging
 import os
 from flask import Blueprint, request, jsonify
-from services.audio_utils import get_audio_metadata, extract_features
+from services.audio_utils import generate_md5, get_audio_metadata, extract_features, get_audio_mime_type
 
 feature_bp = Blueprint('feature', __name__, url_prefix='/workers/features')
 
@@ -19,11 +19,15 @@ def analyze():
                 continue  # ファイルが存在しない場合はスキップ
             metadata = get_audio_metadata(file_path)
             features = extract_features(file_path)
+            md5 = generate_md5(file_path)
+            audio_mime_type = get_audio_mime_type(file_path)
             
             results.append({
                 'file_path': file_path,
                 'metadata': metadata,
-                'features': features
+                'features': features,
+                'md5': md5,
+                'audio_mime_type': audio_mime_type
             })
 
         return jsonify({'results': results}), 200

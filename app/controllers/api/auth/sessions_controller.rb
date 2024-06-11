@@ -4,8 +4,6 @@ class Api::Auth::SessionsController < DeviseTokenAuth::SessionsController
   include Auth::TokenSynchronization
 
   def create
-    raise CookieDisabledError unless cookies[:auth_token]
-
     auto_signin
   end
 

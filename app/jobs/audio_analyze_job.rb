@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AudioAnalyzeJob < AudioCableBaseJob
-  FILES_PER_BATCH = 10
+  FILES_PER_BATCH = 5
   CHANNEL_PREFIX = 'audio_analyze_channel'
 
   def perform(audio_files, job_status_id, is_all_tracks)
@@ -39,18 +39,16 @@ class AudioAnalyzeJob < AudioCableBaseJob
   end
 
   def update_track(track, result)
-    metadata = AudioUtil.get_metadata(track.path)
-    return unless metadata
-
+    metadata = result[:metadata]
     track.update(
-      year: metadata[:year],
-      audio_mime_type: metadata[:audio_mime_type],
-      cover_image: metadata[:cover_image],
-      cover_mime_type: metadata[:cover_mime_type],
-      name: File.basename(track.path)
+      year: result[:metadata][:year],
+      audio_mime_type: result[:audio_mime_type],
+      name: File.basename(track.path),
+      md5: result[:md5]
     )
     set_metadata(track, result[:metadata])
     set_features(track, result[:features])
+    set_artwork(track,  metadata[:artwork], metadata[:art_mime_type])
   end
 
   def set_metadata(track, metadata)
@@ -77,5 +75,12 @@ class AudioAnalyzeJob < AudioCableBaseJob
     else
       raise ArgumentError, "Unknown feature: #{feature}"
     end
+  end
+
+  def set_artwork(track, artwork, art_mime_type)
+    return if artwork.nil? || art_mime_type.nil?
+
+    track.cover_image = AudioUtil.to_uri(art_mime_type, artwork)
+    track.cover_mime_type = art_mime_type
   end
 end

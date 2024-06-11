@@ -18,7 +18,9 @@ class WorkerAnalyzeFeatureService < WorkerService
       {
         file_path: result[:file_path] || '',
         metadata: result[:metadata] || {},
-        features: result[:features] || {}
+        features: result[:features] || {},
+        md5: result[:md5] || '',
+        audio_mime_type: result[:audio_mime_type] || ''
       }
     end
   end

@@ -34,6 +34,8 @@ docker-compose up --build
 .env.template をコピーして .env ファイルを作成し、解析対象の（オーディオファイルが含まれる）ディレクトリを指定
 ※ 許可されている拡張子は ".mp3", ".wav", ".flac", ".ogg"
 
+Apple Silicon系のMacを使用している場合、`PLATFORM=linux/amd64`を追加してください。
+
 ## CMD
 
 ### 静的解析

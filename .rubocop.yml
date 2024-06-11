@@ -1,0 +1,55 @@
+require:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-rspec
+
+Metrics/BlockLength:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 150
+  Exclude:
+    - 'app/models/**/*.rb'
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/AbcSize:
+  Max: 40
+  
+Style/Documentation:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 12
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+# Anotate により自動生成されるため
+Metrics/LineLength:
+  Exclude:
+    - 'app/models/**/*.rb'
+
+
+AllCops:
+  SuggestExtensions: false
+  Exclude:
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'coverage/**/*'
+    - 'vendor/**/*'
+    - "db/**/*"
+    - 'bin/**/*'
+    - 'public/**/*'
+    - 'storage/**/*'
+    - 'config/initializers/*'

@@ -1,0 +1,81 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: containers/local/db/Dockerfile
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --ft_min_word_len=1
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - '7306:3306'
+    volumes:
+      - db-volume:/var/lib/mysql
+
+  web:
+    build:
+      context: .
+      dockerfile: containers/local/web/Dockerfile
+    ports:
+      - "7300:3000"
+    depends_on:
+      - db
+    tty: true
+    stdin_open: true
+    command: ./bin/local_rails_start.sh
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: root
+      DATABASE_PASSWORD: password
+      MODEL_DIR: /llm
+      WORKER_URL: http://worker:5328
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - .:/usr/src/app
+      - ${AUDIO_PATH}:/audios
+      - ./llm:/llm
+      - ./fixtures:/usr/src/app/spec/fixtures/sample
+
+  worker:
+    build:
+      context: .
+      dockerfile: containers/local/worker/Dockerfile
+    ports:
+      - "5328:5328"
+    command: ./bin/local_worker_start.sh
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./workers:/usr/src/app
+      - ./workers/venv:/usr/src/app/venv
+      - ./bin:/usr/src/app/bin
+      - ${AUDIO_PATH}:/audios
+      - ./llm:/llm
+      - ./fixtures:/usr/src/app/tests/fixtures/sample
+    environment:
+      MODEL_DIR: /llm
+
+  # front:
+  #   build:
+  #     context: .
+  #     dockerfile: containers/local/front/Dockerfile
+  #   command: ./bin/local_next_start.sh
+  #   tty: true
+  #   ports:
+  #     - "7301:3000"
+  #   volumes:
+  #     - ./frontend:/usr/src/app
+  #     - ./bin:/usr/src/app/bin
+  #     - frontend-node-modules:/usr/src/app/node_modules
+      
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  db-volume:
+  redis-data:
+  frontend-node-modules:

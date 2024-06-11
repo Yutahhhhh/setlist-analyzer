@@ -1,0 +1,18 @@
+{
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "db",
+      "driver": "MySQL",
+      "name": "setlist-analyzer",
+      "database": "rails_setlist_analyzer_development",
+      "username": "root",
+      "password": "",
+      "connectString": "mysql://root:@localhost:7306/mysql"
+    }
+  ]
+}

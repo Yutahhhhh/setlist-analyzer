@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Starting worker process"
+sh ./devtools/run_worker_format
+
+echo "Starting web process"
+sh ./devtools/run_web_rubocop

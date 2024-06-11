@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+create_table 'track_transitions', force: :cascade, comment: '楽曲の切り替えタイミングを保持するテーブル' do |t|
+  t.bigint   'user_id',                      comment: 'ユーザーID'
+  t.integer  'prev_track_id',   null: false, comment: '前のセットリストの楽曲ID（setlist_tracksテーブルの外部キー）'
+  t.integer  'next_track_id',   null: false, comment: '次のセットリストの楽曲ID（setlist_tracksテーブルの外部キー）'
+  t.integer  'transition_time', null: false, comment: '切り替えタイミングの秒数'
+  t.string   'transition_type', null: false, comment: '切り替え方法（文字で表記）'
+
+  t.timestamps
+
+  t.index %i[prev_track_id next_track_id user_id]
+end

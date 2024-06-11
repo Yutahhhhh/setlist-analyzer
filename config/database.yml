@@ -1,0 +1,15 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: root
+
+development:
+  <<: *default
+  database: rails_setlist_analyzer_development
+  host: <%= ENV.fetch("DATABASE_HOST") { 'localhost' } %>
+
+test:
+  <<: *default
+  database: rails_setlist_analyzer_test
+  host: <%= ENV.fetch("DATABASE_HOST") { 'localhost' } %>

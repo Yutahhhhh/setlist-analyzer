@@ -1,0 +1,1 @@
+export const FILE_EXTENTIONS = [".mp3", ".wav", ".flac", ".ogg"];

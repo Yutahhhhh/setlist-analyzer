@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+create_table 'setlists', force: :cascade, comment: 'セットリストの基本情報を保持するテーブル' do |t|
+  t.bigint   'user_id',                      comment: '所持しているユーザーID'
+  t.string   'name',            null: false, comment: '名前'
+  t.string   'genre_name',      null: false, comment: 'ジャンル名'
+  t.integer  'rating',          null: false, comment: '評価（1〜5）'
+
+  t.timestamps
+
+  t.index :user_id
+end

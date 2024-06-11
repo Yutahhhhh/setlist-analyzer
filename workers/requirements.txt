@@ -1,0 +1,11 @@
+Flask
+flask-cors
+librosa
+numpy
+mutagen
+tensorflow
+pylint
+autopep8
+black
+isort
+pytest

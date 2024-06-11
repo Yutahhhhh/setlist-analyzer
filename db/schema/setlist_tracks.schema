@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+create_table 'setlist_tracks', force: :cascade, comment: 'セットリストと楽曲の関連を保持するテーブル' do |t|
+  t.bigint   'user_id',                      comment: '所持しているユーザーID'
+  t.integer  'track_id',        null: false, comment: 'トラックID（tracksテーブルの外部キー）'
+  t.integer  'setlist_id',      null: false, comment: 'セットリストID（setlistsテーブルの外部キー）'
+  t.integer  'play_order',      null: false, comment: '再生する順番'
+
+  t.timestamps
+
+  t.index %i[track_id setlist_id user_id]
+end

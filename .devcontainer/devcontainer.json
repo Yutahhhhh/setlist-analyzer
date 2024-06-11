@@ -1,0 +1,16 @@
+{
+  "name": "setlist-analyzer",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "service": "web",
+  "workspaceFolder": "/usr/src/app",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [
+    3000,
+    3306,
+    5328,
+    6379
+  ],
+  "postCreateCommand": "bundle install"
+}

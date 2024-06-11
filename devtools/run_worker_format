@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# PyLint
+docker compose exec -T worker bash -c "pylint --rcfile=/usr/src/app/pylintrc /usr/src/app/*.py > /usr/src/app/pylint_result.log"
+
+# autopep8
+docker compose exec -T worker bash -c "autopep8 --in-place --aggressive --aggressive /usr/src/app/*.py"
+
+# black
+docker compose exec -T worker bash -c "black /usr/src/app/*.py"
+
+# isort
+docker compose exec -T worker bash -c "isort /usr/src/app/*.py"

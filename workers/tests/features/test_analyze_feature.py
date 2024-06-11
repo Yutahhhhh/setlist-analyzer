@@ -1,7 +1,6 @@
 import os
 import pytest
 import json
-import pdb
 
 sample_path = os.getenv('PYTHONPATH', '/workers') + '/tests/fixtures/sample/'
 # ファイルタイプとパスのリストを定義
@@ -27,10 +26,13 @@ def test_audio_analysis_success(client, file_type, file_path, caplog):
     assert result['file_path'] == file_path
     assert 'metadata' in result
     assert 'features' in result
+    assert 'md5' in result
+    assert 'audio_mime_type' in result
 
-    # 特徴量の値の範囲を検証
+    # 各値の検証
     validate_features(result['features'])
     validate_metadata(result['metadata'], file_type)
+    assert len(result['md5']) == 32  # MD5ハッシュの長さが正しいか確認
 
 @pytest.mark.parametrize("file_path, expected_status", [
     (sample_path + 'test.m4a', 500),  # 許可されていないファイルタイプ
@@ -63,7 +65,7 @@ def validate_features(features):
     assert features['duration'] > 0, "持続時間が不正です。"
 
 def validate_metadata(metadata, file_type):
-    fields = ['title', 'artist', 'album', 'genre']
+    fields = ['title', 'artist', 'album', 'genre', 'year', 'artwork', 'art_mime_type']
     for field in fields:
         assert isinstance(metadata[field], (str, type(None))), f"{field}は文字列またはNoneであるべきです。"
         

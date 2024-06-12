@@ -16,16 +16,16 @@ jobs:
       run: docker-compose -f docker-compose.yml up -d db redis
     - name: Wait for MySQL to be ready
       run: |
-        until docker-compose exec db mysqladmin ping --silent; do
+        until docker-compose exec -T db mysqladmin ping --silent; do
           echo 'waiting for mysql to be connectable...'
           sleep 1
         done
     - name: Build and run web service
       run: docker-compose -f docker-compose.yml up -d web
     - name: Run Rubocop
-      run: docker-compose exec web bundle exec rubocop -c .rubocop.yml 
+      run: docker-compose exec -T web bundle exec rubocop -c .rubocop.yml 
     - name: Run Rspec
-      run: docker-compose exec web bundle exec rspec
+      run: docker-compose exec -T web bundle exec rspec
     - name: Stop and remove Docker containers
       run: docker-compose down
 
@@ -38,17 +38,17 @@ jobs:
     - name: Build and run worker service
       run: docker-compose -f docker-compose.yml up -d worker
     - name: Install dependencies
-      run: docker-compose exec worker pip install -r requirements.txt
+      run: docker-compose exec -T worker pip install -r requirements.txt
     - name: Run pylint
-      run: docker-compose exec worker pylint **/*.py
+      run: docker-compose exec -T worker pylint **/*.py
     - name: Run autopep8
-      run: docker-compose exec worker autopep8 --in-place --aggressive --aggressive **/*.py
+      run: docker-compose exec -T worker autopep8 --in-place --aggressive --aggressive **/*.py
     - name: Run black
-      run: docker-compose exec worker black .
+      run: docker-compose exec -T worker black .
     - name: Run isort
-      run: docker-compose exec worker isort .
+      run: docker-compose exec -T worker isort .
     - name: Run pytest
-      run: docker-compose exec worker pytest
+      run: docker-compose exec -T worker pytest
     - name: Stop and remove Docker containers
       run: docker-compose down
 

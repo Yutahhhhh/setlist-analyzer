@@ -57,7 +57,6 @@ jobs:
     - name: Set up database
       run: |
         sudo apt-get install -y libmysqlclient-dev
-        cp config/database.ci.yml config/database.yml
         bundle exec rake db:create ridgepole:apply
 
     - name: Run tests
@@ -91,7 +90,7 @@ jobs:
         cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run Lint
       run: |
-        pylint --rcfile=pylintrc $(find . -type f -name "*.py")
+        pylint --rcfile=./pylintrc $(find . -type f -name "*.py")
     - name: Run Tests
       run: |
         pytest

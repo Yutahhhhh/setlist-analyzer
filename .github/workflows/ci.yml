@@ -22,10 +22,10 @@ jobs:
           echo 'waiting for mysql to be connectable...'
           sleep 1
         done
-    - name: Install dependencies
-      run: docker-compose exec -T web bundle install
     - name: Build and run web service
       run: docker-compose -f docker-compose.yml up -d web
+    - name: Install dependencies
+      run: docker-compose exec -T web bundle install
     - name: Run Rubocop
       run: docker compose exec -T web bundle exec rubocop -c .rubocop.yml
     - name: Run Rspec
@@ -44,7 +44,7 @@ jobs:
     - name: Build and run worker service
       run: docker-compose -f docker-compose.yml up -d worker
     - name: Install dependencies
-      run: docker-compose exec -T worker bash -c "pip install -r requirements.txt"
+      run: docker-compose exec -T worker bash -c "./venv/bin/pip install -r requirements.txt --verbose"
     - name: Run pylint
       run: docker compose exec -T worker bash -c  "pylint --rcfile=/usr/src/app/pylintrc /usr/src/app/*.py"
     - name: Run pytest

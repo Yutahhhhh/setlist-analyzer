@@ -44,39 +44,17 @@ RSpec.describe Track, type: :model do
 
   describe '#cover_image_url' do
     it 'cover_image_urlが生成されていること' do
-      stub_metadata
       track = create(:track, :with_cover_image, path: target_audio_file_path)
       expect(track.cover_image_url).to be_present
     end
   end
 
-  describe '#fetch_metadata' do
+  describe '#fetch' do
     it '各パラメータが設定されていること' do
-      stub_metadata
       track = build(:track, path: target_audio_file_path)
-      track.fetch_metadata(target_audio_file_path, add_cover: false)
-      expect(track.title).to be_present
-      expect(track.artist).to be_present
-      expect(track.album).to be_present
-      expect(track.genre).to be_present
-      expect(track.year).to be_present
-      expect(track.audio_mime_type).to be_present
-      expect(track.cover_mime_type).to be_present
+      track.fetch(target_audio_file_path)
+      expect(track.path).to be_present
+      expect(track.name).to be_present
     end
-  end
-
-  def stub_metadata
-    allow(AudioUtil).to receive(:get_metadata)
-      .with(target_audio_file_path)
-      .and_return({
-                    title: 'Example Title',
-                    artist: 'Artist Name',
-                    album: 'Album Name',
-                    genre: 'Genre',
-                    year: '2021',
-                    audio_mime_type: 'audio/mpeg',
-                    cover_mime_type: 'image/jpeg',
-                    cover_image: 'data:image/jpeg;base64,...'
-                  })
   end
 end

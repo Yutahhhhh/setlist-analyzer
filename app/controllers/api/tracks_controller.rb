@@ -66,7 +66,7 @@ module Api
         track = Track.find_or_initialize_by(path: file, user_id: current_user.id)
         next if !is_all_tracks && track.persisted?
 
-        track.fetch_metadata(file, add_cover: true)
+        track.fetch(file)
         track.save
       end
     end

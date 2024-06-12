@@ -69,20 +69,11 @@ class Track < ApplicationRecord
     cover_image.url if cover_image.present?
   end
 
-  def fetch_metadata(path, add_cover: false)
+  def fetch(path)
     return if path.blank?
 
-    meta = AudioUtil.get_metadata(path)
     self.path = path
     self.name = File.basename(path)
-    self.title = meta[:title]
-    self.artist = meta[:artist]
-    self.album = meta[:album]
-    self.genre = meta[:genre]
-    self.year = meta[:year]
-    self.audio_mime_type = meta[:audio_mime_type]
-    self.cover_mime_type = meta[:cover_mime_type]
-    self.cover_image = meta[:cover_image] if add_cover
     self
   end
 end

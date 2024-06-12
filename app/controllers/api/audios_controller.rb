@@ -8,7 +8,7 @@ module Api
       total_count = all_files.count
       paginated_files = paginate_files(all_files, page, per_page)
 
-      tracks = extract_tracks_metadata(paginated_files)
+      tracks = extract_tracks(paginated_files)
       render json: TrackBlueprint.render({
                                            total_item_count: total_count,
                                            total_pages: paginated_files.total_pages,
@@ -41,8 +41,8 @@ module Api
       Kaminari.paginate_array(files).page(page).per(per_page)
     end
 
-    def extract_tracks_metadata(paginated_files)
-      paginated_files.map { |file| Track.new.fetch_metadata(file) }
+    def extract_tracks(paginated_files)
+      paginated_files.map { |file| Track.new.fetch(file) }
     end
 
     def search_params

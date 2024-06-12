@@ -4,7 +4,7 @@ FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
 WORKDIR /usr/src/app
 
 RUN apt-get update -qq && \
-    apt-get install -y build-essential nodejs default-mysql-client libmariadb-dev git graphviz libtag1-dev && \
+    apt-get install -y build-essential nodejs default-mysql-client libmariadb-dev git graphviz && \
     apt-get clean
 
 RUN bundle config set --local path 'vendor/bundle'

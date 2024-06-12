@@ -70,7 +70,6 @@ gem 'httparty'
 
 # Music File
 gem 'mime-types'
-gem 'taglib-ruby'
 
 # Authentication
 gem 'devise'

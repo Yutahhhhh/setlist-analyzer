@@ -39,7 +39,9 @@
 
 
 /workers/logs/*
+/workers/venv/*
 /workers/*.log
+/workers/tests/fixtures/*
 __pycache__/
 *.py[cod]
 

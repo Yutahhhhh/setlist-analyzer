@@ -1,6 +1,6 @@
 services:
   db:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/db/Dockerfile
@@ -13,7 +13,7 @@ services:
       - db-volume:/var/lib/mysql
 
   web:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/web/Dockerfile
@@ -35,10 +35,9 @@ services:
       - .:/usr/src/app
       - ${AUDIO_PATH}:/audios
       - ./llm:/llm
-      - ./fixtures:/usr/src/app/spec/fixtures/sample
 
   worker:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/worker/Dockerfile
@@ -49,7 +48,6 @@ services:
     stdin_open: true
     volumes:
       - ./workers:/usr/src/app
-      - ./workers/venv:/usr/src/app/venv
       - ./bin:/usr/src/app/bin
       - ${AUDIO_PATH}:/audios
       - ./llm:/llm
@@ -58,7 +56,7 @@ services:
       MODEL_DIR: /llm
 
   front:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/front/Dockerfile
@@ -72,7 +70,7 @@ services:
       - frontend-node-modules:/usr/src/app/node_modules
       
   redis:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     image: redis:latest
     container_name: redis
     ports:

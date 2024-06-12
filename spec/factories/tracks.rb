@@ -15,7 +15,7 @@ FactoryBot.define do
     duration { rand(200..300) }
 
     trait :with_cover_image do
-      cover_image { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/sample/test.png').to_s) }
+      cover_image { Rack::Test::UploadedFile.new(Rails.root.join('fixtures/test.png').to_s) }
       cover_mime_type { 'image/png' }
     end
 

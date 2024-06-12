@@ -1,3 +1,7 @@
+"""
+This module configures the Flask application and its routes.
+"""
+
 import sys
 
 from flask import Flask
@@ -11,6 +15,12 @@ sys.dont_write_bytecode = True
 
 
 def create_app():
+    """
+    Create and configure the Flask application instance.
+
+    Returns:
+        Flask app: The configured Flask application.
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
 

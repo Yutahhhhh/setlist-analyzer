@@ -13,6 +13,7 @@ jobs:
     env:
       AUDIO_PATH: '/'
       REDIS_URL: redis://localhost:6379/0
+      DATABASE_HOST: db
     services:
       db:
         image: mysql:8.0.25
@@ -90,7 +91,7 @@ jobs:
         cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run Lint
       run: |
-        pylint --rcfile=./pylintrc $(find . -type f -name "*.py")
+        pylint --rcfile=./pylintrc --ignore=venv .
     - name: Run Tests
       run: |
         pytest

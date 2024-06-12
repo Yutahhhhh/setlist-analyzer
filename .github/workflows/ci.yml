@@ -13,6 +13,22 @@ jobs:
     defaults:
       run:
         working-directory: ./
+    services:
+      db:
+        image: mysql:8.0.25
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
@@ -21,6 +37,20 @@ jobs:
         ruby-version: '3.2.0'
     - name: Install dependencies
       run: bundle install
+    - name: Set environment variables
+      run: |
+        echo "REDIS_URL=redis://localhost:6379/0" >> $GITHUB_ENV
+        echo "DATABASE_HOST=localhost" >> $GITHUB_ENV
+        echo "DATABASE_USERNAME=root" >> $GITHUB_ENV
+        echo "DATABASE_NAME=rails_setlist_analyzer_test" >> $GITHUB_ENV
+    - name: Wait for MySQL to be ready
+      run: |
+        until mysqladmin ping -h"localhost" --silent; do
+          echo 'waiting for mysql to be connectable...'
+          sleep 1
+        done
+    - name: Copy fixtures
+      run: cp -r ./fixtures/* ./spec/fixtures/sample
     - name: Run Rubocop
       run: bundle exec rubocop -c .rubocop.yml 
     - name: Run Rspec
@@ -39,6 +69,8 @@ jobs:
         python-version: '3.9'
     - name: Install dependencies
       run: pip install -r requirements.txt
+    - name: Copy fixtures
+      run: cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run pylint
       run: pylint **/*.py
     - name: Run autopep8

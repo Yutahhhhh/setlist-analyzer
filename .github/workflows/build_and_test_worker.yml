@@ -2,7 +2,11 @@ name: Worker CI
 
 on:
   pull_request:
+    paths:
+      - 'workers/**'
   push:
+    paths:
+      - 'workers/**'
     branches:
       - main
       - develop

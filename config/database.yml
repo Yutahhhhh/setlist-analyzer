@@ -3,13 +3,13 @@ default: &default
   encoding: utf8mb4
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: root
+  password: <%= ENV['MYSQL_ROOT_PASSWORD'] %>
+  host: <%= ENV.fetch("DATABASE_HOST") { 'localhost' } %>
 
 development:
   <<: *default
   database: rails_setlist_analyzer_development
-  host: <%= ENV.fetch("DATABASE_HOST") { 'localhost' } %>
 
 test:
   <<: *default
   database: rails_setlist_analyzer_test
-  host: <%= ENV.fetch("DATABASE_HOST") { 'localhost' } %>

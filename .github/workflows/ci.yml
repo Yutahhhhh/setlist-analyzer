@@ -49,7 +49,9 @@ jobs:
         bundle install
 
     - name: Copy fixtures
-      run: cp -r ./fixtures/* ./spec/fixtures/sample/
+      run: |
+        mkdir -p ./spec/fixtures/sample/
+        cp -r ./fixtures/* ./spec/fixtures/sample/
     
     - name: Set up database
       run: |
@@ -85,7 +87,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Copy fixtures
-      run: cp -r ../fixtures/* ./tests/fixtures/sample/
+      run: |
+        mkdir -p ./tests/fixtures/sample
+        cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run Lint
       run: |
         pylint --rcfile=.pylintrc $(find . -type f -name "*.py")

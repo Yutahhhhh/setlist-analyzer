@@ -14,6 +14,7 @@ jobs:
       AUDIO_PATH: '/'
       REDIS_URL: redis://localhost:6379/0
       DATABASE_HOST: db
+      MYSQL_ROOT_PASSWORD: password
     services:
       db:
         image: mysql:8.0.25
@@ -30,7 +31,7 @@ jobs:
     steps:
     - name: Wait for MySQL to be ready
       run: |
-        until mysqladmin ping -h db -uroot -ppassword --silent; do
+        until mysqladmin -h ${{ env.DATABASE_HOST }} -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} ping --silent; do
           echo 'waiting for mysql to be connectable...'
           sleep 1
         done

@@ -1,4 +1,5 @@
 import logging
+import os
 
 from config import Config
 
@@ -6,6 +7,8 @@ from config import Config
 def setup_logging():
     """アプリケーションのロギングを設定します。"""
     config = Config()
+    log_directory = "logs"
+    os.makedirs(log_directory, exist_ok=True)
 
     if config.FLASK_ENV == "development":
         logging.basicConfig(

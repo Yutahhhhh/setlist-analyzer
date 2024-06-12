@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  rails:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+    - name: Install dependencies
+      run: bundle install
+    - name: Run Rubocop
+      run: bundle exec rubocop
+    - name: Run Rspec
+      run: bundle exec rspec
+
+  flask:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./workers
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Run pylint
+      run: pylint **/*.py
+    - name: Run autopep8
+      run: autopep8 --in-place --aggressive --aggressive **/*.py
+    - name: Run black
+      run: black .
+    - name: Run isort
+      run: isort .
+    - name: Run pytest
+      run: pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: yarn install
+    - name: Run lint
+      run: yarn lint

@@ -4,9 +4,11 @@ on:
   pull_request:
     paths:
       - 'workers/**'
+      - '.github/workflows/build_and_test_worker.yml'
   push:
     paths:
       - 'workers/**'
+      - '.github/workflows/build_and_test_worker.yml'
     branches:
       - main
       - develop
@@ -21,7 +23,7 @@ jobs:
       AUDIO_PATH: '/'
       PYTHONPATH: ${{ github.workspace }}/workers
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v2
       with:

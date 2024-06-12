@@ -16,10 +16,6 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest
-    env:
-      AUDIO_PATH: '/'
-      REDIS_URL: redis://redis:6379/0
-      DATABASE_HOST: 127.0.0.1
     outputs:
       cache-key: ${{ steps.cache-keys.outputs.cache-key }}
     steps:
@@ -64,6 +60,11 @@ jobs:
   rspec:
     needs: setup
     runs-on: ubuntu-latest
+    env:
+      AUDIO_PATH: '/'
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_HOST: 127.0.0.1
+      MYSQL_ROOT_PASSWORD: password
     services:
       db:
         image: mysql:8.0.25

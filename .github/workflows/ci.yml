@@ -12,41 +12,86 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AUDIO_PATH: '/'
+    services:
+      db:
+        image: mysql:8.0.25
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Docker Compose
-      run: docker-compose -f docker-compose.yml up -d db redis
-    - name: Wait for MySQL to be ready
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2.0'
+
+    - name: Cache Ruby gems
+      uses: actions/cache@v3
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems- 
+
+    - name: Install dependencies
       run: |
-        until docker-compose exec -T db mysqladmin ping --silent; do
-          echo 'waiting for mysql to be connectable...'
-          sleep 1
-        done
-    - name: Build and run web service
-      run: docker-compose -f docker-compose.yml up -d web
+        sudo apt-get update -qq
+        gem install bundler
+        bundle install
+
+    - name: Copy fixtures
+      run: cp -r ./fixtures/* ./spec/fixtures/sample/
+    
+    - name: Set up database
+      run: |
+        sudo apt-get install -y libmysqlclient-dev
+        cp config/database.ci.yml config/database.yml
+        bundle exec rake db:create ridgepole:apply
+
+    - name: Run tests
+      env:
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        bundle exec rspec
+
     - name: Run Rubocop
-      run: docker compose exec -T web bundle exec rubocop -c .rubocop.yml
-    - name: Run Rspec
-      run: docker-compose exec -T web bundle exec rspec
-    - name: Stop and remove Docker containers
-      run: docker-compose down
+      run: |
+        bundle exec rubocop
 
   flask:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./workers
     env:
       AUDIO_PATH: '/'
     steps:
     - uses: actions/checkout@v2
-    - name: Build and run worker service
-      run: docker-compose -f docker-compose.yml up -d worker
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
     - name: Install dependencies
-      run: docker-compose exec -T worker bash -c "pip install -r requirements.txt"
-    - name: Run pylint
-      run: docker compose exec -T worker bash -c  "pylint --rcfile=/usr/src/app/pylintrc /usr/src/app/*.py"
-    - name: Run pytest
-      run: docker-compose exec -T worker bash -c "pytest"
-    - name: Stop and remove Docker containers
-      run: docker-compose down
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Copy fixtures
+      run: cp -r ../fixtures/* ./tests/fixtures/sample/
+    - name: Run Lint
+      run: |
+        pylint --rcfile=.pylintrc $(find . -type f -name "*.py")
+    - name: Run Tests
+      run: |
+        pytest
 
   frontend:
     runs-on: ubuntu-latest

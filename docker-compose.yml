@@ -1,6 +1,6 @@
 services:
   db:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/db/Dockerfile
@@ -13,7 +13,7 @@ services:
       - db-volume:/var/lib/mysql
 
   web:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/web/Dockerfile
@@ -38,7 +38,7 @@ services:
       - ./fixtures:/usr/src/app/spec/fixtures/sample
 
   worker:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/worker/Dockerfile
@@ -57,7 +57,7 @@ services:
       MODEL_DIR: /llm
 
   front:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     build:
       context: .
       dockerfile: containers/local/front/Dockerfile
@@ -71,7 +71,7 @@ services:
       - frontend-node-modules:/usr/src/app/node_modules
       
   redis:
-    platform: ${PLATFORM}
+    platform: ${PLATFORM:-linux/amd64}
     image: redis:latest
     container_name: redis
     ports:

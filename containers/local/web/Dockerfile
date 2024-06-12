@@ -8,15 +8,6 @@ RUN apt-get update -qq && \
     apt-get clean
 
 RUN bundle config set --local path 'vendor/bundle'
-# Bundlerの設定
-RUN gem install bundler -v '2.5.10'
-
-# GemfileとGemfile.lockをコピー
-COPY Gemfile Gemfile.lock ./
-
-# Ruby依存関係のインストール
-RUN bundle install --verbose
-
 
 ENV BUNDLE_PATH="/usr/local/bundle"
 

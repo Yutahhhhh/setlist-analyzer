@@ -10,77 +10,47 @@ on:
 jobs:
   rails:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./
-    services:
-      db:
-        image: mysql:8.0.25
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2.0'
-    - name: Install dependencies
-      run: bundle install
-    - name: Set environment variables
-      run: |
-        echo "REDIS_URL=redis://localhost:6379/0" >> $GITHUB_ENV
-        echo "DATABASE_HOST=localhost" >> $GITHUB_ENV
-        echo "DATABASE_USERNAME=root" >> $GITHUB_ENV
-        echo "DATABASE_NAME=rails_setlist_analyzer_test" >> $GITHUB_ENV
+    - name: Set up Docker Compose
+      run: docker-compose -f docker-compose.yml up -d db redis
     - name: Wait for MySQL to be ready
       run: |
-        until mysqladmin ping -h"localhost" --silent; do
+        until docker-compose exec db mysqladmin ping --silent; do
           echo 'waiting for mysql to be connectable...'
           sleep 1
         done
-    - name: Copy fixtures
-      run: cp -r ./fixtures/* ./spec/fixtures/sample
+    - name: Build and run web service
+      run: docker-compose -f docker-compose.yml up -d web
     - name: Run Rubocop
-      run: bundle exec rubocop -c .rubocop.yml 
+      run: docker-compose exec web bundle exec rubocop -c .rubocop.yml 
     - name: Run Rspec
-      run: bundle exec rspec
+      run: docker-compose exec web bundle exec rspec
+    - name: Stop and remove Docker containers
+      run: docker-compose down
 
   flask:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./workers
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
+    - name: Set up Docker Compose
+      run: docker-compose -f docker-compose.yml up -d db redis
+    - name: Build and run worker service
+      run: docker-compose -f docker-compose.yml up -d worker
     - name: Install dependencies
-      run: pip install -r requirements.txt
-    - name: Copy fixtures
-      run: cp -r ../fixtures/* ./tests/fixtures/sample
+      run: docker-compose exec worker pip install -r requirements.txt
     - name: Run pylint
-      run: pylint **/*.py
+      run: docker-compose exec worker pylint **/*.py
     - name: Run autopep8
-      run: autopep8 --in-place --aggressive --aggressive **/*.py
+      run: docker-compose exec worker autopep8 --in-place --aggressive --aggressive **/*.py
     - name: Run black
-      run: black .
+      run: docker-compose exec worker black .
     - name: Run isort
-      run: isort .
+      run: docker-compose exec worker isort .
     - name: Run pytest
-      run: pytest
+      run: docker-compose exec worker pytest
+    - name: Stop and remove Docker containers
+      run: docker-compose down
 
   frontend:
     runs-on: ubuntu-latest

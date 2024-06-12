@@ -98,4 +98,6 @@ jobs:
         sudo apt-get install -y libmysqlclient-dev
         bundle exec rake db:create ridgepole:apply
     - name: Run tests
-      run: bundle exec rspec
+      run: |
+        mkdir -p ./spec/fixtures/audios/
+        bundle exec rspec

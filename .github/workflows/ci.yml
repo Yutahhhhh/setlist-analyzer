@@ -30,7 +30,7 @@ jobs:
     steps:
     - name: Wait for MySQL to be ready
       run: |
-        until docker compose exec -T db mysqladmin -uroot -ppassword ping --silent; do
+        until mysqladmin ping -h db -uroot -ppassword --silent; do
           echo 'waiting for mysql to be connectable...'
           sleep 1
         done
@@ -101,6 +101,7 @@ jobs:
         pylint --rcfile=./pylintrc --ignore=venv .
     - name: Run Tests
       run: |
+        export PYTHONPATH=$PWD
         pytest
 
   frontend:

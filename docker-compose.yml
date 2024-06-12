@@ -35,7 +35,6 @@ services:
       - .:/usr/src/app
       - ${AUDIO_PATH}:/audios
       - ./llm:/llm
-      - ./fixtures:/usr/src/app/spec/fixtures/sample
 
   worker:
     platform: ${PLATFORM:-linux/amd64}

@@ -56,11 +56,6 @@ jobs:
         sudo apt-get update -qq
         gem install bundler
         bundle install
-
-    - name: Copy fixtures
-      run: |
-        mkdir -p ./spec/fixtures/sample/
-        cp -r ./fixtures/* ./spec/fixtures/sample/
     
     - name: Set up database
       run: |

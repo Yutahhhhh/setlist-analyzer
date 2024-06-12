@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Track, type: :model do
   subject(:track) { build(:track) }
 
-  let(:target_audio_file_path) { Rails.root.join('spec/fixtures/sample/test.mp3') }
+  let(:target_audio_file_path) { Rails.root.join('fixtures/test.mp3') }
 
   describe 'factory' do
     it '有効なファクトリが存在すること' do

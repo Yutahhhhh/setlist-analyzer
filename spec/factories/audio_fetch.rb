@@ -6,7 +6,7 @@ FactoryBot.define do
   factory :audio_fetch, class: 'Hash' do
     skip_create
     # sampleにはtest.mp3, test.m4a, test.wav, test.flacがそれぞれある
-    sample_dir { Rails.root.join('spec/fixtures/sample') }
+    sample_dir { Rails.root.join('fixtures') }
     base_dir { Pathname.new(Rails.application.config.audio_base_dir) }
 
     trait :custom_files do

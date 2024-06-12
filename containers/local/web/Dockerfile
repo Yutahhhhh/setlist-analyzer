@@ -8,6 +8,8 @@ RUN apt-get update -qq && \
     apt-get clean
 
 RUN bundle config set --local path 'vendor/bundle'
+RUN gem install bundler -v '2.5.10'
+RUN bundle install
 
 ENV BUNDLE_PATH="/usr/local/bundle"
 

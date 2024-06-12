@@ -10,6 +10,8 @@ on:
 jobs:
   rails:
     runs-on: ubuntu-latest
+    env:
+      AUDIO_PATH: '/'
     steps:
     - uses: actions/checkout@v2
     - name: Set up Docker Compose
@@ -31,6 +33,8 @@ jobs:
 
   flask:
     runs-on: ubuntu-latest
+    env:
+      AUDIO_PATH: '/'
     steps:
     - uses: actions/checkout@v2
     - name: Set up Docker Compose

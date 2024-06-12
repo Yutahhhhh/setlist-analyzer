@@ -14,13 +14,52 @@ on:
       - develop
 
 jobs:
-  rails:
+  setup:
     runs-on: ubuntu-latest
-    env:
-      AUDIO_PATH: '/'
-      REDIS_URL: redis://redis:6379/0
-      DATABASE_HOST: 127.0.0.1
-      MYSQL_ROOT_PASSWORD: password
+    outputs:
+      cache-key: ${{ steps.cache-keys.outputs.cache-key }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2.0'
+    - name: Generate cache key
+      id: cache-keys
+      run: echo "::set-output name=cache-key::$(echo ${{ hashFiles('**/Gemfile.lock') }})"
+    - name: Cache Ruby gems
+      uses: actions/cache@v3
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ steps.cache-keys.outputs.cache-key }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+
+  rubocop:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2.0'
+    - name: Cache Ruby gems
+      uses: actions/cache@v3
+      with:
+        path: vendor/bundle
+        key: ${{ needs.setup.outputs.cache-key }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        gem install bundler
+        bundle install
+    - name: Run Rubocop
+      run: bundle exec rubocop
+
+  rspec:
+    needs: setup
+    runs-on: ubuntu-latest
     services:
       db:
         image: mysql:8.0.25
@@ -33,47 +72,25 @@ jobs:
         image: redis
         ports:
           - 6379:6379
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Wait for MySQL to be ready
-      run: |
-        until mysqladmin -h ${{ env.DATABASE_HOST }} -P 3306 -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ping --silent; do
-          echo 'waiting for mysql to be connectable...'
-          sleep 1
-        done
-
+    - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2.0'
-
     - name: Cache Ruby gems
       uses: actions/cache@v3
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gems- 
-
+        key: ${{ needs.setup.outputs.cache-key }}
     - name: Install dependencies
       run: |
         sudo apt-get update -qq
         gem install bundler
         bundle install
-
     - name: Set up database
       run: |
         sudo apt-get install -y libmysqlclient-dev
         bundle exec rake db:create ridgepole:apply
-
-    - name: Prepare test fixtures
-      run: mkdir -p ./spec/fixtures/audios/
-
     - name: Run tests
       run: bundle exec rspec
-
-    - name: Run Rubocop
-      run: bundle exec rubocop

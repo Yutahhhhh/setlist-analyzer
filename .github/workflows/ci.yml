@@ -65,6 +65,7 @@ jobs:
 
     - name: Run tests
       run: |
+        mkdir -p ./spec/fixtures/audios/
         bundle exec rspec
 
     - name: Run Rubocop

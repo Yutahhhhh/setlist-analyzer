@@ -28,6 +28,12 @@ jobs:
           - 6379:6379
 
     steps:
+    - name: Wait for MySQL to be ready
+      run: |
+        until docker compose exec -T db mysqladmin -uroot -ppassword ping --silent; do
+          echo 'waiting for mysql to be connectable...'
+          sleep 1
+        done
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -91,6 +97,7 @@ jobs:
         cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run Lint
       run: |
+        export PYTHONPATH=$PWD
         pylint --rcfile=./pylintrc --ignore=venv .
     - name: Run Tests
       run: |

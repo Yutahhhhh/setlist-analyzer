@@ -15,6 +15,7 @@ jobs:
       REDIS_URL: redis://redis:6379/0
       DATABASE_HOST: 127.0.0.1
       MYSQL_ROOT_PASSWORD: password
+      RAILS_ENV: test
     services:
       db:
         image: mysql:8.0.25

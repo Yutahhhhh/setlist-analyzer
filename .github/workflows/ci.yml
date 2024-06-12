@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AUDIO_PATH: '/'
-      REDIS_URL: redis://localhost:6379/0
-      DATABASE_HOST: db
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_HOST: 127.0.0.1
       MYSQL_ROOT_PASSWORD: password
     services:
       db:
@@ -31,7 +31,7 @@ jobs:
     steps:
     - name: Wait for MySQL to be ready
       run: |
-        until mysqladmin -h ${{ env.DATABASE_HOST }} -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} ping --silent; do
+        until mysqladmin -h ${{ env.DATABASE_HOST }} -P 3306 -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ping --silent; do
           echo 'waiting for mysql to be connectable...'
           sleep 1
         done

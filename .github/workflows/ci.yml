@@ -39,6 +39,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build and run worker service
       run: docker-compose -f docker-compose.yml up -d worker
+    - name: Install dependencies
+      run: docker-compose exec -T worker bash -c "pip install -r requirements.txt"
     - name: Run pylint
       run: docker compose exec -T worker bash -c  "pylint --rcfile=/usr/src/app/pylintrc /usr/src/app/*.py"
     - name: Run pytest

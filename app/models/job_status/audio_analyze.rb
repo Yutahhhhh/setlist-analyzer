@@ -4,19 +4,19 @@
 #
 # Table name: job_statuses
 #
-#  id                                                    :bigint           not null, primary key
-#  finished_at(終了時刻)                                 :datetime
-#  job_type(0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析) :integer          default("audio_genre_train"), not null
-#  message(メッセージ（エラーメッセージや進捗など）)     :text(65535)
-#  progress(進捗)                                        :integer          default(0), not null
-#  result(結果や出力内容)                                :text(65535)
-#  retry_count(再試行回数)                               :integer          default(0)
-#  started_at(開始時刻)                                  :datetime
-#  status(0: 実行中, 1: 完了, 2: 失敗)                   :integer          default("running"), not null
-#  created_at                                            :datetime         not null
-#  updated_at                                            :datetime         not null
-#  job_id(一意の識別子)                                  :string(255)      not null
-#  user_id(起動したユーザーのID)                         :bigint
+#  id                                                                  :bigint           not null, primary key
+#  finished_at(終了時刻)                                               :datetime
+#  job_type(0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析, 30: 歌詞解析) :integer          default("audio_genre_train"), not null
+#  message(メッセージ（エラーメッセージや進捗など）)                   :text(65535)
+#  progress(進捗)                                                      :integer          default(0), not null
+#  result(結果や出力内容)                                              :text(65535)
+#  retry_count(再試行回数)                                             :integer          default(0)
+#  started_at(開始時刻)                                                :datetime
+#  status(0: 実行中, 1: 完了, 2: 失敗)                                 :integer          default("running"), not null
+#  created_at                                                          :datetime         not null
+#  updated_at                                                          :datetime         not null
+#  job_id(一意の識別子)                                                :string(255)      not null
+#  user_id(起動したユーザーのID)                                       :bigint
 #
 # Indexes
 #

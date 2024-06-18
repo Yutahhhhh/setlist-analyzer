@@ -23,4 +23,9 @@ FactoryBot.define do
     job_type { :audio_genre_train }
     message { 'Training in progress...' }
   end
+
+  factory :audio_analyze_lyric_job_status, parent: :job_status, class: 'JobStatus::AudioAnalyzeLyric' do
+    job_type { :audio_analyze_lyric }
+    message { 'Lyric Analyzing in progress...' }
+  end
 end

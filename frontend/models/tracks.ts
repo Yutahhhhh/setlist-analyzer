@@ -57,6 +57,8 @@ export default class Track extends Model {
   timeSignature: number = 0;
   valence: number = 0;
   url: string = '';
+  // frontend
+  isChecked: boolean = false;
 
   constructor(initValues?: Partial<ITrack>) {
     super();

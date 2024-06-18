@@ -23,5 +23,11 @@ FactoryBot.define do
       file_prefix { 'file' }
       extension { 'mp3' }
     end
+
+    factory :track_with_phrases do
+      after(:create) do |track|
+        create_list(:track_phrase, 5, track: track) # 例として5つのtrack_phraseを生成
+      end
+    end
   end
 end

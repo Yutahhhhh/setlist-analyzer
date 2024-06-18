@@ -26,9 +26,9 @@ import { useJobStore } from "@/store/useJobStore";
 import JobAlert from "@/components/JobAlert";
 const drawerWidth = 240;
 const LINKS: { text: string; href: string; icon: React.ReactNode }[] = [
-  { text: "解析済み", href: "/", icon: <MusicIcon /> },
+  { text: "登録済み", href: "/", icon: <MusicIcon /> },
   { text: "ファイル一覧", href: "/list/", icon: <ListIcon /> },
-  { text: "トレーニング", href: "/train/", icon: <ModelTrainingIcon /> }
+  { text: "トレーニング", href: "/train/", icon: <ModelTrainingIcon /> },
 ];
 
 interface Props {

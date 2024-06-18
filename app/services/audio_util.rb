@@ -4,7 +4,7 @@ module AudioUtil
   ROOT_DIR = Rails.application.config.audio_base_dir
   EXTENSION_TO_MIME_TYPE_MAP = {
     '.mp3' => 'audio/mpeg',
-    '.wav' => 'audio/wav',
+    '.wav' => 'audio/x-wav',
     '.flac' => 'audio/flac',
     '.ogg' => 'audio/ogg'
   }.freeze

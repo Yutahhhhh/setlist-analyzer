@@ -8,8 +8,8 @@ class AudioGenreTrainJob < AudioCableBaseJob
     perform_job(audio_files, job_status_id)
   end
 
-  def job_process(files, user_id)
-    WorkerGenreService.start_train(files, user_id)
+  def job_process(files, job_status)
+    WorkerGenreService.start_train(files, job_status.user_id)
   end
 
   def find_job_status(job_status_id)

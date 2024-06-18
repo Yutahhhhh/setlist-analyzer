@@ -3,9 +3,14 @@ flask-cors
 librosa
 numpy
 mutagen
-tensorflow
 pylint
 autopep8
 black
 isort
 pytest
+pydub
+mecab-python3
+spleeter
+wheel
+setuptools
+git+https://github.com/openai/whisper.git

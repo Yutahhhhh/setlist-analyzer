@@ -1,6 +1,6 @@
 import Model from "@/models/model";
 
-const jobTypes = ['audio_genre_train', 'audio_analyze', ''] as const;
+const jobTypes = ['audio_genre_train', 'audio_analyze', 'audio_analyze_lyric', ''] as const;
 const statesTypes = ['running', 'success', 'failed', ''] as const;
 export type JobType = typeof jobTypes[number];
 export type JobStatusState = typeof statesTypes[number];
@@ -63,6 +63,8 @@ export default class JobStatus extends Model {
         return 'AudioGenreTrainChannel';
       case 'audio_analyze':
         return 'AudioAnalyzeChannel';
+      case 'audio_analyze_lyric':
+        return 'AudioAnalyzeLyricChannel';
       default:
         return '';
     }
@@ -86,7 +88,7 @@ export default class JobStatus extends Model {
       case 'audio_genre_train':
         return 'ジャンル学習';
       case 'audio_analyze':
-        return '楽曲解析';
+        return '楽曲登録';
       default:
         return '';
     }

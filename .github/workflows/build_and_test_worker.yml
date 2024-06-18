@@ -41,4 +41,4 @@ jobs:
         pylint --rcfile=./pylintrc --ignore=venv .
     - name: Run Tests
       run: |
-        pytest
+        pytest -s

@@ -10,7 +10,8 @@ import {
   TablePagination,
   IconButton,
   Typography,
-  Box
+  Box,
+  Checkbox
 } from "@mui/material";
 import Image from "next/image";
 import { PageTrackList, ITrack } from "@/interfaces/tracks";
@@ -24,6 +25,7 @@ interface TrackTableProps extends PageTrackList {
   per: number;
   page: number;
   tracks: Track[];
+  showSelect?: boolean;
   handleChangePage: (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -40,8 +42,11 @@ const TrackTable: React.FC<TrackTableProps> = ({
   page,
   handleChangePage,
   handleChangeRowsPerPage,
+  showSelect = false,
 }) => {
-  const { currentTrack, setTrack, isPlaying, togglePlay } = useTrackStore();
+  const { currentTrack, setTrack, isPlaying, togglePlay, setChecked } =
+    useTrackStore();
+  const columnCount = showSelect ? 3 : 2; // チェックボックスが表示される場合は3列、そうでない場合は2列
 
   const handlePlayPause = async (track: ITrack) => {
     if (currentTrack && currentTrack.path === track.path) {
@@ -64,14 +69,23 @@ const TrackTable: React.FC<TrackTableProps> = ({
         <TableBody>
           {tracks.map((track, index) => (
             <TableRow key={index}>
-              <TableCell align="right">
+              {showSelect && (
+                <TableCell
+                  align="center"
+                  style={{ width: 48 }}
+                >
+                  <Checkbox
+                    checked={track.isChecked}
+                    onChange={(e) => setChecked(track, e.target.checked)}
+                  />
+                </TableCell>
+              )}
+              <TableCell align="center" style={{ width: 48 }}>
                 <Box
-                  sx={{
-                    position: "relative",
-                    display: "inline-block",
-                    width: 48,
-                    height: 48,
-                  }}
+                  width={48}
+                  height={48}
+                  position="relative"
+                  display="inline-block"
                 >
                   {track.coverImageUrl && (
                     <Image
@@ -116,7 +130,7 @@ const TrackTable: React.FC<TrackTableProps> = ({
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[10, 15, 25]}
-              colSpan={2}
+              colSpan={columnCount}
               count={totalItemCount}
               rowsPerPage={per}
               page={page}

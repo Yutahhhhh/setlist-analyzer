@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AudioAnalyzeJob < AudioCableBaseJob
-  FILES_PER_BATCH = 5
+  FILES_PER_BATCH = 10
   CHANNEL_PREFIX = 'audio_analyze_channel'
 
   def perform(audio_files, job_status_id, is_all_tracks)
@@ -9,9 +9,9 @@ class AudioAnalyzeJob < AudioCableBaseJob
     perform_job(audio_files, job_status_id)
   end
 
-  def job_process(files, user_id)
-    res = WorkerAnalyzeFeatureService.start_analyze(files, user_id)
-    process_results(res, user_id)
+  def job_process(files, job_status)
+    res = WorkerAnalyzeFeatureService.start_analyze(files)
+    process_results(res, job_status.user_id)
   end
 
   def find_job_status(job_status_id)
@@ -41,17 +41,17 @@ class AudioAnalyzeJob < AudioCableBaseJob
   def update_track(track, result)
     metadata = result[:metadata]
     track.update(
-      year: result[:metadata][:year],
       audio_mime_type: result[:audio_mime_type],
       name: File.basename(track.path),
       md5: result[:md5]
     )
     set_metadata(track, result[:metadata])
     set_features(track, result[:features])
-    set_artwork(track,  metadata[:artwork], metadata[:art_mime_type])
+    set_artwork(track, metadata[:artwork], metadata[:art_mime_type])
   end
 
   def set_metadata(track, metadata)
+    track.year = metadata[:year]
     track.title = metadata[:title]
     track.artist = metadata[:artist]
     track.album = metadata[:album]

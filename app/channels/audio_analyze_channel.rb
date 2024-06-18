@@ -19,8 +19,8 @@ class AudioAnalyzeChannel < ApplicationCable::Channel
     "audio_analyze_channel_#{params[:job_id]}"
   end
 
-  def find_job(_job_id)
-    JobStatus::AudioAnalyze.find_by(job_id: params[:job_id])
+  def find_job(job_id)
+    JobStatus::AudioAnalyze.find_by(job_id:)
   end
 
   def transmit_current_status(job_status)

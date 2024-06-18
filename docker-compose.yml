@@ -21,6 +21,7 @@ services:
       - "7300:3000"
     depends_on:
       - db
+      - worker
     tty: true
     stdin_open: true
     command: ./bin/local_rails_start.sh
@@ -48,6 +49,7 @@ services:
     stdin_open: true
     volumes:
       - ./workers:/usr/src/app
+      - ./workers/venv:/usr/src/app/venv
       - ./bin:/usr/src/app/bin
       - ${AUDIO_PATH}:/audios
       - ./llm:/llm

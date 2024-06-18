@@ -13,8 +13,9 @@ Rails.application.routes.draw do
     resources :audios, only: [:index]
     resources :genre_trains, only: [:create]
     resources :job_statuses, only: [:index]
-    resources :tracks, only: [:index] do
+    resources :tracks, only: %i[index destroy] do
       post :analyze, on: :collection
+      post :analyze_lyrics, on: :collection
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -35,3 +35,24 @@ export const startAudioAnalysis = async ({
     throw error;
   }
 };
+
+export const startAudioAnalyzeLyrics = async (ids: number[]): Promise<JobStatus> => {
+  const axiosInstance = axiosWithAuth();
+  try {
+    const response = await axiosInstance.post<IJobStatus>(`${CONTROLLER_PATH}/analyze_lyrics`, { ids });
+    return new JobStatus(response.data);
+  } catch (error) {
+    console.error('Failed to fetch audio directory:', error);
+    throw error;
+  }
+}
+
+export const destroyAudios = async (ids: number[]): Promise<void> => {
+  const axiosInstance = axiosWithAuth();
+  try {
+    await axiosInstance.delete(`${CONTROLLER_PATH}`, { data: { ids } });
+  } catch (error) {
+    console.error('Failed to delete audio:', error);
+    throw error;
+  }
+}

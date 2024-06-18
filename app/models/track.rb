@@ -46,7 +46,10 @@ class Track < ApplicationRecord
                               inverse_of: :prev_track
   has_many :next_transitions, class_name: 'TrackTransition', foreign_key: 'next_track_id', dependent: :destroy,
                               inverse_of: :next_track
+  has_many :track_phrases, dependent: :destroy
   belongs_to :user
+
+  accepts_nested_attributes_for :track_phrases, allow_destroy: true
 
   mount_base64_uploader :cover_image, TrackUploader
 
@@ -75,5 +78,9 @@ class Track < ApplicationRecord
     self.path = path
     self.name = File.basename(path)
     self
+  end
+
+  def valid_path?
+    File.exist?(path)
   end
 end

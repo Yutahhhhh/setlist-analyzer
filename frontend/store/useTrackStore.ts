@@ -12,6 +12,7 @@ interface TrackState {
   setVolume: (volume: number) => void;
   setCurrentTime: (time: number) => void;
   setTracks: (tracks: Track[]) => void;
+  setChecked: (track: Track, isChecked: boolean) => void;
 }
 
 export const useTrackStore = create<TrackState>((set) => ({
@@ -25,4 +26,17 @@ export const useTrackStore = create<TrackState>((set) => ({
   setVolume: (volume) => set({ volume }),
   setCurrentTime: (time) => set({ currentTime: time }),
   setTracks: (tracks) => set({ tracks }),
+  // TrackTableからCheckboxの状態を変更するための関数
+  setChecked: (track: Track, isChecked: boolean) => {
+    set((state) => {
+      const newTracks = state.tracks.map((t) => {
+        if (t.id === track.id) {
+          t.isChecked = isChecked;
+        }
+        return t;
+      });
+      console.log(newTracks.map((t) => t.id));
+      return { tracks: newTracks };
+    });
+  }
 }));

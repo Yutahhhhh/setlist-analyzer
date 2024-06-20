@@ -4,6 +4,7 @@ require 'blueprinter'
 
 class TrackBlueprint < Blueprinter::Base
   view :show do
+    identifier :id
     fields :acousticness,
            :spectral_contrast,
            :duration,

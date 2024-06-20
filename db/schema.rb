@@ -14,7 +14,7 @@ ActiveRecord::Schema[7.1].define(version: 0) do
   create_table "job_statuses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", comment: "JOBの実行状況を追跡するためのテーブル", force: :cascade do |t|
     t.bigint "user_id", comment: "起動したユーザーのID"
     t.string "job_id", null: false, comment: "一意の識別子"
-    t.integer "job_type", default: 10, null: false, comment: "0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析"
+    t.integer "job_type", default: 10, null: false, comment: "0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析, 30: 歌詞解析"
     t.integer "status", default: 0, null: false, comment: "0: 実行中, 1: 完了, 2: 失敗"
     t.integer "progress", default: 0, null: false, comment: "進捗"
     t.text "message", comment: "メッセージ（エラーメッセージや進捗など）"
@@ -46,6 +46,16 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_setlists_on_user_id"
+  end
+
+  create_table "track_phrases", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", comment: "トラックの歌詞から選択されたフレーズとそのタイミング情報を保存するテーブルです", force: :cascade do |t|
+    t.string "phrase", null: false, comment: "トラックの歌詞から抽出された具体的なフレーズ"
+    t.float "start_time", default: 0.0, null: false, comment: "フレーズが開始する時間（秒単位）"
+    t.float "end_time", default: 0.0, null: false, comment: "フレーズが終了する時間（秒単位）。start_timeよりも大きな値である必要があります"
+    t.bigint "track_id", null: false, comment: "関連するトラックのID"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["track_id"], name: "index_track_phrases_on_track_id"
   end
 
   create_table "track_transitions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", comment: "楽曲の切り替えタイミングを保持するテーブル", force: :cascade do |t|
@@ -84,9 +94,9 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.integer "mode", comment: "曲のモード（1:メジャー、0:マイナー、1は明るい感じ、0は暗い感じを示す）"
     t.integer "time_signature", comment: "曲の拍子記号（1小節あたりの拍数、一般的に2, 3, 4, 6など）"
     t.integer "measure", comment: "小節数（曲の構造に基づく整数値）"
-    t.float "duration", comment: "再生時間（秒、曲の長さを秒単位で示す）"
     t.string "path", null: false, comment: "音楽ファイルのパス"
     t.text "lyrics", comment: "歌詞"
+    t.float "duration", comment: "再生時間（秒、曲の長さを秒単位で示す）"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_tracks_on_path", unique: true
@@ -124,4 +134,5 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "track_phrases", "tracks", name: "track_phrases_track_id_fk"
 end

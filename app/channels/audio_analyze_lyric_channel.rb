@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AudioAnalyzeChannel < ApplicationCable::Channel
+class AudioAnalyzeLyricChannel < ApplicationCable::Channel
   def subscribed
     stream_from channel_id
 
@@ -16,14 +16,14 @@ class AudioAnalyzeChannel < ApplicationCable::Channel
   private
 
   def channel_id
-    "audio_analyze_channel_#{params[:job_id]}"
+    "audio_analyze_lyric_channel_#{params[:job_id]}"
   end
 
   def find_job(job_id)
-    JobStatus::AudioAnalyze.find_by(job_id:)
+    JobStatus::AudioAnalyzeLyric.find_by(job_id:)
   end
 
   def transmit_current_status(job_status)
-    AudioAnalyzeChannel.broadcast_to(channel_id, ::JobStatusBlueprint.render(job_status))
+    AudioAnalyzeLyricChannel.broadcast_to(channel_id, ::JobStatusBlueprint.render(job_status))
   end
 end

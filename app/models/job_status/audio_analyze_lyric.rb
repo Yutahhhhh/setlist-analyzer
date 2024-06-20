@@ -23,9 +23,30 @@
 #  index_job_statuses_on_job_id   (job_id) UNIQUE
 #  index_job_statuses_on_user_id  (user_id)
 #
-class JobStatus < ApplicationRecord
-  belongs_to :user
-  enum status: { running: 0, completed: 1, failed: 2 }
-  enum job_type: { not_specified: 0, audio_genre_train: 10, audio_analyze: 20, audio_analyze_lyric: 30 }
-  validates :job_id, presence: true, uniqueness: { case_sensitive: false }
+class JobStatus::AudioAnalyzeLyric < JobStatus
+  before_validation :set_default_dependency
+
+  def prepare!
+    update!(
+      status: :running,
+      job_id: SecureRandom.uuid,
+      started_at: Time.current,
+      message: 'Lyric Analyzing in progress...'
+    )
+  end
+
+  def finish!
+    update!(
+      status: :completed,
+      progress: 100,
+      message: 'Lyric Analyzing completed successfully',
+      finished_at: Time.current
+    )
+  end
+
+  private
+
+  def set_default_dependency
+    self.job_type = :audio_analyze_lyric
+  end
 end

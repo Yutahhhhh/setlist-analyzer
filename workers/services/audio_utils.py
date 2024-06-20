@@ -6,12 +6,14 @@ import os
 
 import librosa
 import numpy as np
+import tensorflow as tf
 from mutagen.easyid3 import EasyID3
 from mutagen.flac import FLAC
 from mutagen.mp3 import MP3
 from mutagen.oggvorbis import OggVorbis
 from mutagen.wave import WAVE
-
+from mutagen.id3 import ID3, ID3NoHeaderError
+from spleeter.separator import Separator
 
 def get_audio_metadata(file_path):
     ext = os.path.splitext(file_path)[1].lower()
@@ -44,9 +46,12 @@ def get_audio_metadata(file_path):
         logging.error(f"Error processing metadata for {file_path}: {str(e)}")
         raise e
 
-
 def get_mp3_metadata(file_path):
-    audio = EasyID3(file_path)
+    try:
+        audio = EasyID3(file_path)
+    except ID3NoHeaderError:
+        audio = ID3()
+
     artwork = None
     art_mime_type = None
     try:
@@ -59,7 +64,6 @@ def get_mp3_metadata(file_path):
     except Exception as e:
         logging.error(f"Error extracting artwork for {file_path}: {str(e)}")
     return audio, artwork, art_mime_type
-
 
 def get_flac_metadata(file_path):
     audio = FLAC(file_path)
@@ -78,19 +82,24 @@ def get_audio_mime_type(file_path):
 
 def extract_features(file_path):
     try:
-        y, sr = librosa.load(file_path)
+        y, sr = librosa.load(file_path, sr=None)
 
         if y.size == 0:  # ファイルが空か損傷している場合
             return None
+        
+        # n_fftが信号長より大きい場合には、信号をゼロパディングしてn_fftに合わせる
+        n_fft = 1024
+        if len(y) < n_fft:
+            y = np.pad(y, (0, n_fft - len(y)), mode='constant')
 
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
-        chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+        chroma = librosa.feature.chroma_stft(y=y, sr=sr, n_fft=n_fft)
         key = np.argmax(np.sum(chroma, axis=1))
         mode = 1 if np.mean(librosa.feature.tonnetz(y=y, sr=sr)) > 0 else 0
         time_signature = len(beat_frames)
 
         return {
-            "tempo": float(tempo[0]) if tempo.size > 0 else None,
+            "tempo": float(tempo),
             "key": int(key) if key is not None else None,
             "mode": mode,
             "time_signature": int(time_signature),
@@ -107,7 +116,7 @@ def extract_features(file_path):
             "duration": float(librosa.get_duration(y=y, sr=sr)),
         }
     except Exception as e:
-        print(f"Error processing features for {file_path}: {str(e)}")
+        logging.error(f"Error processing features for {file_path}: {str(e)}")
         return None
 
 
@@ -121,3 +130,10 @@ def generate_md5(file_path):
     except Exception as e:
         logging.error(f"Error generating MD5 for {file_path}: {str(e)}")
         return None
+
+# MEMO: 処理後に一時ファイルを削除すること
+def extract_vocal(file_path):
+    separator = Separator('spleeter:2stems')  # session引数を取り除く
+    separator.separate_to_file(file_path, '/tmp')
+    output_path = os.path.join('/tmp', os.path.splitext(os.path.basename(file_path))[0], 'vocals.wav')
+    return output_path

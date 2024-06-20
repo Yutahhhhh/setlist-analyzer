@@ -31,7 +31,10 @@ class AudioCableBaseJob
   end
 
   def process_batch(files, job_status)
-    job_process(files, job_status.user_id)
+    job_process(files, job_status)
+  rescue StandardError => e
+    channel_id = "#{self.class::CHANNEL_PREFIX}_#{job_status.job_id}"
+    handle_error(job_status, e, channel_id)
   end
 
   def update_job_status(job_status, batch_index, total_batches, channel_id)
@@ -61,6 +64,7 @@ class AudioCableBaseJob
     job_status.update!(status: :failed, message: "Failed: #{error.message}")
     logger.error("ジョブ失敗: #{job_status.job_id}, エラー: #{error}")
     broadcast_status(job_status, channel_id)
+    raise error
   end
 
   def broadcast_status(job_status, channel_id)

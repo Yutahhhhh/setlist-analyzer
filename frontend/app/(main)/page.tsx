@@ -13,6 +13,7 @@ import {
   OutlinedInput,
   Select,
   TextField,
+  ButtonGroup
 } from "@mui/material";
 import { useState } from "react";
 import { useTrackStore } from "@/store/useTrackStore";
@@ -22,10 +23,13 @@ import { TrackSearchParams } from "@/types/common";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { buildURL } from "@/utils/RouterUtil";
+import { startAudioAnalyzeLyrics, destroyAudios } from "@/services/trackApi";
+import { useJobStore } from "@/store/useJobStore";
 
 export default function Home() {
   const router = useRouter();
   const params = useSearchParams();
+  const { unshiftJob, setAudioAnalyzeLyricsJob, audioAnalyzeLyricsJob } = useJobStore();
   const [searchParams, setSearchParams] = useState<TrackSearchParams>({
     page: (params.get("page") || 1) as number,
     per: (params.get("per") || 10) as number,
@@ -38,6 +42,7 @@ export default function Home() {
   const { currentPage, totalItemCount, isLoading, error } =
     useTrack(searchParams);
   const tracks = useTrackStore((state) => state.tracks);
+  const isJobRunning = !!audioAnalyzeLyricsJob;
 
   if (isLoading) {
     return (
@@ -71,6 +76,32 @@ export default function Home() {
     router.push(buildURL("/", requestParams));
     setSearchParams(requestParams);
   };
+
+  const handleAnalyzeLyrics = async () => {
+    try {
+      if (!confirm("選択中の曲の歌詞を解析しますか？")) return;
+      const jobStatus = await startAudioAnalyzeLyrics(
+        tracks.filter((track) => track.isChecked).map((track) => track.id)
+      );
+      unshiftJob(jobStatus);
+      setAudioAnalyzeLyricsJob(jobStatus);
+    } catch (error) {
+      console.error("Failed to fetch audio directory:", error);
+      throw error;
+    }
+  }
+
+  const handleDeleteTracks = async () => {
+    try {
+      if (!confirm("選択中の曲を削除しますか？")) return;
+      await destroyAudios(
+        tracks.filter((track) => track.isChecked).map((track) => track.id)
+      );
+    } catch (error) {
+      console.error("Failed to fetch audio directory:", error);
+      throw error;
+    }
+  }
 
   return (
     <Container>
@@ -117,12 +148,38 @@ export default function Home() {
           検索
         </Button>
       </Box>
+
+      {tracks.filter((track) => track.isChecked).length > 0 && (
+        <Box m={2} display="flex" justifyContent="end" alignContent="center">
+          <Typography my="auto" px={2}>
+            選択中: {tracks.filter((track) => track.isChecked).length}曲
+          </Typography>
+          <ButtonGroup variant="outlined" aria-label="Loading button group">
+            <Button
+              onClick={handleAnalyzeLyrics}
+              disabled={isJobRunning}
+              startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
+            >
+              歌詞解析
+            </Button>
+            <Button
+              onClick={handleDeleteTracks}
+              disabled={isJobRunning}
+              startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
+            >
+              削除
+            </Button>
+          </ButtonGroup>
+        </Box>
+      )}
+
       <TrackTable
         tracks={tracks}
         totalItemCount={totalItemCount}
         currentPage={currentPage}
         per={searchParams.per as number}
         page={searchParams.page as number}
+        showSelect
         handleChangePage={(_, newPage) => {
           handleSearch({ page: Number(newPage) });
         }}

@@ -62,7 +62,7 @@ export default function UnAnalyzed() {
 
   const handleAnalyze = async () => {
     try {
-      if (!confirm("検索条件で解析しますか？")) return;
+      if (!confirm("検索条件で登録しますか？")) return;
       const jobStatus = await startAudioAnalysis({
         page: 1,
         per: formParams.per,
@@ -142,13 +142,13 @@ export default function UnAnalyzed() {
               }}
             />
           }
-          label="解析済みデータを含める"
+          label="登録済みデータを含める"
         />
         <Button variant="contained" onClick={() => handleSearch()}>
           検索
         </Button>
         <Button variant="contained" onClick={handleAnalyze}>
-          検索条件で解析
+          検索条件で登録
         </Button>
       </Box>
       <TrackTable

@@ -34,6 +34,17 @@ module Api
       render json: JobStatusBlueprint.render(job_status), status: :ok
     end
 
+    def analyze_lyrics
+      tracks = current_user.tracks.where(id: params[:ids])
+      job_status = schedule_audio_analyze_lyric_job(tracks)
+      render json: JobStatusBlueprint.render(job_status), status: :ok
+    end
+
+    def destroy
+      current_user.tracks.where(params[:ids]).destroy_all
+      render json: {}, status: :ok
+    end
+
     private
 
     def analyze_params
@@ -75,6 +86,13 @@ module Api
       job_status = JobStatus::AudioAnalyze.new(user_id: current_user.id)
       job_status.prepare!
       AudioAnalyzeJob.perform_async(files, job_status.id, is_all_tracks)
+      job_status
+    end
+
+    def schedule_audio_analyze_lyric_job(tracks)
+      job_status = JobStatus::AudioAnalyzeLyric.new(user_id: current_user.id)
+      job_status.prepare!
+      AudioAnalyzeLyricJob.perform_async(tracks.pluck(:path), job_status.id)
       job_status
     end
   end

@@ -26,6 +26,7 @@ RSpec.describe Track, type: :model do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_many(:setlist_tracks).dependent(:destroy) }
     it { is_expected.to have_many(:setlists).through(:setlist_tracks) }
+    it { is_expected.to have_many(:track_phrases).dependent(:destroy) }
 
     it {
       expect(track).to have_many(:prev_transitions)

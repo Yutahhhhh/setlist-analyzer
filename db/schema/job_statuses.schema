@@ -3,7 +3,7 @@
 create_table 'job_statuses', force: :cascade, comment: 'JOBの実行状況を追跡するためのテーブル' do |t|
   t.bigint   'user_id',                             comment: '起動したユーザーのID'
   t.string   'job_id', null: false,                 comment: '一意の識別子'
-  t.integer  'job_type', default: 10, null: false,  comment: '0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析'
+  t.integer  'job_type', default: 10, null: false,  comment: '0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析, 30: 歌詞解析'
   t.integer  'status', default: 0, null: false,     comment: '0: 実行中, 1: 完了, 2: 失敗'
   t.integer  'progress', default: 0, null: false,   comment: '進捗'
   t.text     'message',                             comment: 'メッセージ（エラーメッセージや進捗など）'

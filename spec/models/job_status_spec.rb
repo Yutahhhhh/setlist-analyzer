@@ -23,7 +23,7 @@ RSpec.describe JobStatus, type: :model do
 
     it {
       expect(job_status).to define_enum_for(:job_type).with_values(
-        not_specified: 0, audio_genre_train: 10, audio_analyze: 20
+        not_specified: 0, audio_genre_train: 10, audio_analyze: 20, audio_analyze_lyric: 30
       )
     }
   end

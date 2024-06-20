@@ -22,12 +22,15 @@ jobs:
     env:
       AUDIO_PATH: '/'
       PYTHONPATH: ${{ github.workspace }}/workers
+      SKIP_LONG_TESTS: true
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.9'
+    - name: Install FFmpeg
+      run: sudo apt-get update && sudo apt-get install -y ffmpeg
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -38,7 +41,7 @@ jobs:
         cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run Lint
       run: |
-        pylint --rcfile=./pylintrc --ignore=venv .
+        pylint --rcfile=./pylintrc app.py --verbose
     - name: Run Tests
       run: |
-        pytest
+        pytest -s

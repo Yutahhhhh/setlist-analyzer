@@ -1,6 +1,6 @@
 import pytest
 import tensorflow as tf
-from app.app import create_app
+from ..app import create_app
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 

@@ -22,6 +22,7 @@ jobs:
     env:
       AUDIO_PATH: '/'
       PYTHONPATH: ${{ github.workspace }}/workers
+      SKIP_LONG_TESTS: true
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python

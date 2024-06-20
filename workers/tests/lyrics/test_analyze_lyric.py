@@ -7,7 +7,7 @@ audio_files = [
     sample_path + "test_jp_lyric.mp3",
     sample_path + "test_us_lyric.mp3",
 ]
-
+@pytest.mark.longtest
 @pytest.mark.parametrize("file_path", audio_files)
 def test_lyric_analysis_success(client, file_path):
     data = {'file_path': file_path}

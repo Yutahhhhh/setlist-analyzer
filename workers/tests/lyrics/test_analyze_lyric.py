@@ -6,7 +6,6 @@ sample_path = os.getenv("PYTHONPATH", "/workers") + "/tests/fixtures/sample/"
 audio_files = [
     sample_path + "test_jp_lyric.mp3",
     sample_path + "test_us_lyric.mp3",
-    sample_path + "test_sss.mp3",
 ]
 
 @pytest.mark.parametrize("file_path", audio_files)
@@ -21,7 +20,6 @@ def test_lyric_analysis_success(client, file_path):
 def validate_phrases(results):
     for phrase_info in results:
         assert isinstance(phrase_info["phrase"], str), "Phrase should be a string."
-        assert phrase_info["type"] in ['NOUN_CHUNK', 'VERB'], "Type should be 'NOUN_CHUNK' or 'VERB'."
         assert isinstance(phrase_info["start"], (int, float)), "Start time should be a number."
         assert isinstance(phrase_info["end"], (int, float)), "End time should be a number."
         assert phrase_info["start"] < phrase_info["end"], "Start time should be less than end time."

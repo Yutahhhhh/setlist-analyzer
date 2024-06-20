@@ -35,6 +35,9 @@ ja:
         valence: "ポジティブ感"
         cover_mime_type: "サムネのMIMEタイプ"
         cover_image: "サムネ"
+      track_phrase:                 
+        end_time:
+          greater_than: "終了時間は開始時間よりも後でなければなりません。"
   date:
     abbr_day_names:
       - 日

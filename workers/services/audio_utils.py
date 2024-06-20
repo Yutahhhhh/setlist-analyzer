@@ -6,14 +6,14 @@ import os
 
 import librosa
 import numpy as np
+import tensorflow as tf
 from mutagen.easyid3 import EasyID3
 from mutagen.flac import FLAC
 from mutagen.mp3 import MP3
 from mutagen.oggvorbis import OggVorbis
 from mutagen.wave import WAVE
 from mutagen.id3 import ID3, ID3NoHeaderError
-# from spleeter.separator import Separator
-
+from spleeter.separator import Separator
 
 def get_audio_metadata(file_path):
     ext = os.path.splitext(file_path)[1].lower()
@@ -82,7 +82,7 @@ def get_audio_mime_type(file_path):
 
 def extract_features(file_path):
     try:
-        y, sr = librosa.load(file_path)
+        y, sr = librosa.load(file_path, sr=None)
 
         if y.size == 0:  # ファイルが空か損傷している場合
             return None
@@ -99,7 +99,7 @@ def extract_features(file_path):
         time_signature = len(beat_frames)
 
         return {
-            "tempo": float(tempo[0]) if tempo.size > 0 else None,
+            "tempo": float(tempo),
             "key": int(key) if key is not None else None,
             "mode": mode,
             "time_signature": int(time_signature),
@@ -133,8 +133,7 @@ def generate_md5(file_path):
 
 # MEMO: 処理後に一時ファイルを削除すること
 def extract_vocal(file_path):
-    # separator = Separator('spleeter:2stems')  # 2stemsモデルを使用してボーカルと伴奏を分離
-    # separator.separate_to_file(file_path, '/tmp')  # 分離したファイルを一時ディレクトリに保存
-    # output_path = os.path.join('/tmp', os.path.splitext(os.path.basename(file_path))[0], 'vocals.wav')
-    # return output_path
-    return file_path
+    separator = Separator('spleeter:2stems')  # session引数を取り除く
+    separator.separate_to_file(file_path, '/tmp')
+    output_path = os.path.join('/tmp', os.path.splitext(os.path.basename(file_path))[0], 'vocals.wav')
+    return output_path

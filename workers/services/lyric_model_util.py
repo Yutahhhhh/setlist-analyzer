@@ -1,8 +1,8 @@
 import whisper
-import MeCab
+import tensorflow as tf
 
-def initialize_mecab():
-    return MeCab.Tagger("-Ochasen")
+# Warnが出るもののクリティカルな問題ではないため、ログレベルを下げる
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 def initialize_whisper_model():
     model = whisper.load_model("base")
@@ -12,37 +12,18 @@ def audio_to_text(model, file_path):
     result = model.transcribe(file_path, verbose=True)
     return result
 
-def extract_phrases_with_mecab(text):
-    tagger = initialize_mecab()
-    node = tagger.parseToNode(text)
-    phrases = []
-    
-    while node:
-        features = node.feature.split(',')
-        word_type = features[0]
-        if word_type == '名詞' and features[1] == '一般':
-            phrases.append((node.surface, 'NOUN'))
-        elif word_type == '動詞' and features[6] != '*':
-            phrases.append((features[6], 'VERB'))
-        node = node.next
-    
-    return phrases
-
-def find_phrase_times(segments, phrases):
-    segments = filter_repeated_phrases(segments)
+def find_phrase_times(segments):
     times = []
     for segment in segments:
-        segment_text = segment.get('text', '').lower()
-        for phrase, type in phrases:
-            if phrase.lower() in segment_text:
-                start = segment.get('start', 0)
-                end = segment.get('end', 0)
-                times.append({
-                    "phrase": phrase,
-                    "type": type,
-                    "start": start,
-                    "end": end
-                })
+        phrase = segment.get('text', '').lower()
+        start = segment.get('start', 0)
+        end = segment.get('end', 0)
+        times.append({
+            "phrase": phrase,
+            "start": start,
+            "end": end
+        })
+
     return times
 
 # 短時間で繰り返される単語をフィルタリング（ノイズが原因で発生する場合がある）

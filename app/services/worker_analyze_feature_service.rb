@@ -4,8 +4,8 @@ class WorkerAnalyzeFeatureService < WorkerService
   def self.start_analyze(file_paths)
     headers = { 'Content-Type' => 'application/json' }
     body = { file_paths: }.to_json
-    # 1本のリクエストに3分以上かかる場合、timeoutを180以上に設定
-    response = post('/workers/features/analyze', body:, headers:, timeout: 180)
+    # 1本のリクエストに3分以上かかる場合、timeoutを10分に設定
+    response = post('/workers/features/analyze', body:, headers:, timeout: 600)
     raise WorkerServiceError, "解析に失敗しました: #{response.code} - #{response.message}" unless response.ok?
 
     res = response.parsed_response

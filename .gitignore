@@ -6,6 +6,8 @@
 
 .DS_Store
 
+.byebug_history
+
 # Ignore bundler config.
 /.bundle
 
@@ -37,7 +39,7 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-
+/workers/pretrained_models/*
 /workers/logs/*
 /workers/venv/*
 /workers/*.log

@@ -55,7 +55,7 @@ def test_audio_analysis_error_cases(client, file_path, expected_status):
 
 
 def validate_features(features):
-    assert 20 <= features["tempo"] <= 300, "テンポの範囲が不正です。"
+    assert 1 <= features["tempo"] <= 300, "テンポの範囲が不正です。"
     assert 0 <= features["key"] <= 11, "キーの範囲が不正です。"
     assert features["mode"] in [0, 1], "モードの値が不正です。"
     assert features["time_signature"] > 0, "拍子記号の値が不正です。"

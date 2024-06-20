@@ -13,10 +13,10 @@ class AudioAnalyzeLyricJob < AudioCableBaseJob
     @track = Track.find_by(path: files.first, user_id: job_status.user_id)
     raise ArgumentError, 'Track not found' if @track.nil? || !@track.valid_path?
 
-    phrases, lyrics = WorkerAnalyzeLyricService.start_analyze(@track.path)
+    res = WorkerAnalyzeLyricService.start_analyze(@track.path)
     ActiveRecord::Base.transaction do
       @track.track_phrases.destroy_all
-      process_results(phrases, lyrics)
+      process_results(res[:phrases], res[:lyrics])
     end
   end
 
@@ -27,11 +27,10 @@ class AudioAnalyzeLyricJob < AudioCableBaseJob
   private
 
   def process_results(phrases, lyrics)
-    puts "@@@@@@@ phrases: #{phrases}, lyrics: #{lyrics}"
     @track.track_phrases_attributes = phrases.map do |phrase|
       {
-        start_time: phrase[:start_time],
-        end_time: phrase[:end_time],
+        start_time: phrase[:start].to_f,
+        end_time: phrase[:end].to_f,
         phrase: phrase[:phrase]
       }
     end

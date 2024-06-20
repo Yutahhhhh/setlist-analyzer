@@ -11,7 +11,10 @@ from blueprints.genre import genre_bp
 from blueprints.lyric import lyric_bp
 from config import Config
 from services.log_utils import setup_logging
+import os
 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 sys.dont_write_bytecode = True
 
 

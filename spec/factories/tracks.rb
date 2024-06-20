@@ -26,7 +26,7 @@ FactoryBot.define do
 
     factory :track_with_phrases do
       after(:create) do |track|
-        create_list(:track_phrase, 5, track: track) # 例として5つのtrack_phraseを生成
+        create_list(:track_phrase, 5, track:)
       end
     end
   end

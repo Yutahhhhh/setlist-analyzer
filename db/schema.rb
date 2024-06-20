@@ -94,9 +94,9 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.integer "mode", comment: "曲のモード（1:メジャー、0:マイナー、1は明るい感じ、0は暗い感じを示す）"
     t.integer "time_signature", comment: "曲の拍子記号（1小節あたりの拍数、一般的に2, 3, 4, 6など）"
     t.integer "measure", comment: "小節数（曲の構造に基づく整数値）"
-    t.float "duration", comment: "再生時間（秒、曲の長さを秒単位で示す）"
     t.string "path", null: false, comment: "音楽ファイルのパス"
     t.text "lyrics", comment: "歌詞"
+    t.float "duration", comment: "再生時間（秒、曲の長さを秒単位で示す）"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_tracks_on_path", unique: true

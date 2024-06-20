@@ -2,7 +2,7 @@
 
 run_docker_command() {
     local command=$1
-    docker compose exec -T worker bash -c "source venv/bin/activate && $command"
+    docker compose exec -T worker bash -c "$command"
 }
 
 # PyLint

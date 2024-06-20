@@ -41,7 +41,7 @@ jobs:
         cp -r ../fixtures/* ./tests/fixtures/sample
     - name: Run Lint
       run: |
-        pylint --rcfile=./pylintrc --verbose
+        pylint --rcfile=./pylintrc app.py --verbose
     - name: Run Tests
       run: |
         pytest -s

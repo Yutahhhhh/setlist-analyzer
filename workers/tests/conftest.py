@@ -16,7 +16,7 @@ def client(app):
     return app.test_client()
 
 # 処理の重いテストを任意でスキップする
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(_, items):
     if should_skip:
         skip_marker = pytest.mark.skip(reason="Long tests are skipped because SKIP_LONG_TESTS is set.")
         for item in items:

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose exec -T worker bash -c "pytest -s"
+docker compose exec -T -e MODEL_DIR=tests/fixtures/llm worker bash -c "pytest -s"

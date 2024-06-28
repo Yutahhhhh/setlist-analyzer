@@ -11,7 +11,7 @@ def test_train_model_success(client, user_id, track_data, incremental, expected_
     train_response = client.post("/workers/genres/train", json={'user_id': user_id, 'tracks': tracks, 'incremental': incremental})
     assert train_response.status_code == 200, "Training failed: " + str(train_response.json)
 
-    get_genres_response = client.get("/workers/genres/", json={'user_id': user_id})
+    get_genres_response = client.get("/workers/genres/", query_string={'user_id': user_id})
     assert get_genres_response.status_code == 200, "Failed to get genres: " + str(get_genres_response.json)
     trained_genres = get_genres_response.json['genres']
     assert set(trained_genres) == set(expected_genres), "Incorrect genres trained"

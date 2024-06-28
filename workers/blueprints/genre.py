@@ -52,8 +52,7 @@ def predict_genre():
 
 @genre_bp.route("/", methods=["GET"])
 def get_genres():
-    data = request.json
-    user_id = data['user_id']
+    user_id = request.args.get('user_id')
     try:
         if not user_id:
             raise ValueError("User ID is required.")

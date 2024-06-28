@@ -9,7 +9,7 @@ class AudioAnalyzeJob < AudioCableBaseJob
     perform_job(audio_files, job_status_id)
   end
 
-  def job_process(files, job_status)
+  def job_process(files, job_status, _batch_index)
     res = WorkerAnalyzeFeatureService.start_analyze(files)
     process_results(res, job_status.user_id)
   end
@@ -69,7 +69,7 @@ class AudioAnalyzeJob < AudioCableBaseJob
   def set_feature(track, feature, value)
     case feature
     when :tempo, :key, :mode, :time_signature, :acousticness,
-      :spectral_contrast, :energy, :spectral_flatness,
+      :spectral_contrast, :energy, :spectral_flatness, :measure,
       :spectral_bandwidth, :loudness, :mfcc, :valence, :duration
       track.public_send("#{feature}=", value)
     else

@@ -29,7 +29,7 @@ class GenreClassifier:
     def initialize_preprocessor(self):
         return ColumnTransformer(transformers=[
             ('num', StandardScaler(), self.feature_columns[:-4]),
-            ('cat', OneHotEncoder(handle_unknown='ignore'), self.feature_columns[-4:])
+            ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), self.feature_columns[-4:])
         ], remainder='passthrough')
 
     def build_and_train_model(self, X, y, input_dim):

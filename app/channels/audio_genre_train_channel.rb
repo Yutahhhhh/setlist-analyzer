@@ -24,6 +24,6 @@ class AudioGenreTrainChannel < ApplicationCable::Channel
   end
 
   def transmit_current_status(job_status)
-    AudioGenreTrainChannel.broadcast_to(channel_id, ::AudioGenreTrainJobStatusBlueprint.render(job_status))
+    AudioGenreTrainChannel.broadcast_to(channel_id, ::JobStatusBlueprint.render(job_status))
   end
 end

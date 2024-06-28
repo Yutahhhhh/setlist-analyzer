@@ -74,6 +74,7 @@ def validate_features(features):
     assert isinstance(features["mfcc"], float), "MFCCは浮動小数点数であるべきです。"
     assert 0.0 <= features["valence"] <= 1.0, "バレンスの範囲が不正です。"
     assert features["duration"] > 0, "持続時間が不正です。"
+    assert features["measure"] > 0, "小節数が不正です。"
 
 
 def validate_metadata(metadata, file_type):

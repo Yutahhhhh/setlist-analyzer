@@ -93,10 +93,13 @@ def extract_features(file_path):
             y = np.pad(y, (0, n_fft - len(y)), mode='constant')
 
         tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
+        tempo = tempo if tempo is not None else 1
         chroma = librosa.feature.chroma_stft(y=y, sr=sr, n_fft=n_fft)
         key = np.argmax(np.sum(chroma, axis=1))
         mode = 1 if np.mean(librosa.feature.tonnetz(y=y, sr=sr)) > 0 else 0
         time_signature = len(beat_frames)
+        beat_times = librosa.frames_to_time(beat_frames, sr=sr)  # ビートフレームを時間に変換
+        measure = estimate_time_signature(beat_times)
 
         return {
             "tempo": float(tempo),
@@ -114,11 +117,25 @@ def extract_features(file_path):
             "mfcc": float(np.mean(librosa.feature.mfcc(y=y, sr=sr))),
             "valence": float(np.mean(librosa.feature.chroma_stft(y=y, sr=sr))),
             "duration": float(librosa.get_duration(y=y, sr=sr)),
+            "measure": measure,
         }
     except Exception as e:
         logging.error(f"Error processing features for {file_path}: {str(e)}")
         return None
 
+def estimate_time_signature(beat_times):
+    if len(beat_times) < 5:
+        return 4  # デフォルトは4拍子
+
+    intervals = np.diff(beat_times)
+    avg_interval = np.mean(intervals)
+    # 基本的な間隔を4拍子と仮定し、最も近い整数倍に合わせる
+    if avg_interval < 0.5:
+        return 3  # 3/4拍子
+    elif avg_interval < 0.75:
+        return 4  # 4/4拍子
+    else:
+        return 6  # 6/8拍子
 
 def generate_md5(file_path):
     hash_md5 = hashlib.md5()

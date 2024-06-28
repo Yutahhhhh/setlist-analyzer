@@ -34,6 +34,7 @@ export default function UnAnalyzed() {
     page: (params.get("page") || 1) as number,
     per: (params.get("per") || 10) as number,
     filename: (params.get("filename") || "") as string,
+    genres: (params.get("genres") ? params.getAll("genres").join(",") : "") as string,
     extensions: (params.get("extensions")
       ? params.getAll("extensions").join(",")
       : "") as string,
@@ -77,17 +78,25 @@ export default function UnAnalyzed() {
     }
   };
 
-  const handleSearch = (params?: { page?: number; per?: number, arrExts?: string[] }) => {
+  const handleSearch = (params?: {
+    page?: number;
+    per?: number;
+    arrExts?: string[];
+    arrGenres?: string[];
+  }) => {
     const requestParams: TrackSearchParams = {
       page: params?.page || 1,
       per: params?.per || formParams.per,
       filename: formParams.filename,
+      genres: !!params?.arrGenres
+        ? params.arrGenres.join(",")
+        : formParams.genres,
       extensions: !!params?.arrExts
         ? params.arrExts.join(",")
         : formParams.extensions,
       isAllTracks: formParams.isAllTracks,
     };
-    const url = buildURL('/list', requestParams);
+    const url = buildURL("/list", requestParams);
     router.push(url);
     setSearchParams(requestParams);
   };

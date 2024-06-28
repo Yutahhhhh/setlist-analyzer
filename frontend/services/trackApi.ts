@@ -15,6 +15,17 @@ export const getTracks = async (params: TrackListRequestParams): Promise<PageTra
   }
 }
 
+export const getGenres = async (): Promise<string[]> => {
+  const axiosInstance = axiosWithAuth();
+  try {
+    const response = await axiosInstance.get<string[]>(`${CONTROLLER_PATH}/genres`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get genres:', error);
+    throw error;
+  }
+}
+
 export const startAudioAnalysis = async ({
   filename,
   extensions,

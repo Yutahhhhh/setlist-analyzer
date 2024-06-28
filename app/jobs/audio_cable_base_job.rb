@@ -24,14 +24,14 @@ class AudioCableBaseJob
     total_batches = (audio_files.count.to_f / files_per_batch).ceil
 
     audio_files.each_slice(files_per_batch).with_index(1) do |files, batch_index|
-      process_batch(files, job_status)
+      process_batch(files, job_status, batch_index)
       update_job_status(job_status, batch_index, total_batches, channel_id)
     end
     finish_job(job_status, channel_id)
   end
 
-  def process_batch(files, job_status)
-    job_process(files, job_status)
+  def process_batch(files, job_status, batch_index)
+    job_process(files, job_status, batch_index)
   rescue StandardError => e
     channel_id = "#{self.class::CHANNEL_PREFIX}_#{job_status.job_id}"
     handle_error(job_status, e, channel_id)

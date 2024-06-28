@@ -21,6 +21,12 @@ module Api
                                          }, view: :list)
     end
 
+    def genres
+      render json: {
+        genres: current_user.tracks.pluck(:genre).uniq
+      }, status: :ok
+    end
+
     def analyze
       filename, extensions, is_all_tracks = analyze_params.values_at(:filename, :extensions, :is_all_tracks)
       is_all_tracks = ActiveModel::Type::Boolean.new.cast(is_all_tracks)

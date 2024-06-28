@@ -3,5 +3,6 @@ export type TrackSearchParams = {
   per: number;
   filename: string;
   extensions: string;
+  genres?: string;
   isAllTracks?: boolean;
 }

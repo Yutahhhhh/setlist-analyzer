@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-sample_path = os.getenv("PYTHONPATH", "/workers") + "/tests/fixtures/sample/"
+sample_path = os.getenv("PYTHONPATH", "workers") + "/tests/fixtures/sample/"
 audio_files = [
     sample_path + "test_jp_lyric.mp3",
     sample_path + "test_us_lyric.mp3",
@@ -13,7 +13,6 @@ def test_lyric_analysis_success(client, file_path):
     data = {'file_path': file_path}
     response = client.post("/workers/lyrics/analyze", json=data)
     assert response.status_code == 200, f"Failed with response: {response.data.decode()}"
-    print(response.json)
     validate_phrases(response.json.get('phrases', []))
     assert isinstance(response.json.get('lyrics'), str), "Lyrics should be a string."
 

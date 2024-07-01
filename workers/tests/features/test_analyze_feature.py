@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-sample_path = os.getenv("PYTHONPATH", "/workers") + "/tests/fixtures/sample/"
+sample_path = os.getenv("PYTHONPATH", "workers") + "/tests/fixtures/sample/"
 audio_files = {
     "mp3": sample_path + "test.mp3",
     "wav": sample_path + "test.wav",

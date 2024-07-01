@@ -1,13 +1,3 @@
-import whisper
-import tensorflow as tf
-
-# Warnが出るもののクリティカルな問題ではないため、ログレベルを下げる
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-
-def initialize_whisper_model():
-    model = whisper.load_model("base")
-    return model
-
 def audio_to_text(model, file_path):
     result = model.transcribe(file_path, verbose=True)
     return result

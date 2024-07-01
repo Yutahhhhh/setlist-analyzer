@@ -16,7 +16,6 @@ export interface IJobStatus {
   result: string;
   message: string;
   retryCount: number;
-  trainData: string[];
 }
 
 export default class JobStatus extends Model {
@@ -30,7 +29,6 @@ export default class JobStatus extends Model {
   result: string = '';
   message: string = '';
   retryCount: number = 0;
-  trainData: string[] = [];
 
   constructor(initValues?: Partial<IJobStatus>) {
     super();
@@ -89,6 +87,8 @@ export default class JobStatus extends Model {
         return 'ジャンル学習';
       case 'audio_analyze':
         return '楽曲登録';
+      case 'audio_analyze_lyric':
+        return '歌詞解析';
       default:
         return '';
     }

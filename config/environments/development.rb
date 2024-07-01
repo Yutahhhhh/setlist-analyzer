@@ -82,7 +82,9 @@ Rails.application.configure do
 
   config.worker_url = ENV['WORKER_URL']
 
-  config.audio_base_dir = '/audios'
+  config.audio_base_dir = ENV['AUDIO_PATH']
 
   config.web_console.allowed_ips = '0.0.0.0/0'
+
+  config.log_level = :debug
 end

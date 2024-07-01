@@ -3,14 +3,10 @@
 module Api
   class TracksController < Api::ApplicationController
     def index
-      page, per_page, filename, extensions = fetch_search_params
+      page, per_page, filename, extensions, genres, has_lyric_track = fetch_search_params(search_params)
       mime_types = convert_extensions_to_mime_types(extensions)
 
-      tracks = current_user
-               .tracks
-               .by_filename(filename)
-               .by_mime_types(mime_types)
-
+      tracks = current_user.tracks.search(filename:, mime_types:, genres:, has_lyric_track:)
       paginated_files = paginate_tracks(tracks, page, per_page)
 
       render json: TrackBlueprint.render({
@@ -41,13 +37,21 @@ module Api
     end
 
     def analyze_lyrics
-      tracks = current_user.tracks.where(id: params[:ids])
+      if lyrics_params[:analyze_type] == 'ids'
+        tracks = current_user.tracks.where(id: lyrics_params[:ids])
+      else
+        _page, _per_page, filename, extensions, genres, has_lyric_track =
+          fetch_search_params(lyrics_params[:search_params])
+        mime_types = convert_extensions_to_mime_types(extensions)
+        tracks = current_user.tracks.search(filename:, mime_types:, genres:, has_lyric_track:)
+      end
+
       job_status = schedule_audio_analyze_lyric_job(tracks)
       render json: JobStatusBlueprint.render(job_status), status: :ok
     end
 
     def destroy
-      current_user.tracks.where(params[:ids]).destroy_all
+      current_user.tracks.where(destroy_params[:ids]).destroy_all
       render json: {}, status: :ok
     end
 
@@ -58,15 +62,26 @@ module Api
     end
 
     def search_params
-      params.permit(:page, :per, :filename, :extensions)
+      params.permit(:page, :per, :filename, :extensions, :genres, :has_lyric_track)
     end
 
-    def fetch_search_params
+    def lyrics_params
+      params.require(:lyrics).permit(:analyze_type, ids: [],
+                                                    search_params: %i[filename extensions genres has_lyric_track])
+    end
+
+    def destroy_params
+      params.permit(ids: [])
+    end
+
+    def fetch_search_params(target)
       [
-        params[:page] || 1,
-        params[:per] || 10,
-        params[:filename],
-        params[:extensions]&.split(',') || []
+        target[:page] || 1,
+        target[:per] || 10,
+        target[:filename],
+        target[:extensions]&.split(',') || [],
+        target[:genres]&.split(',') || [],
+        target[:has_lyric_track] == 'true'
       ]
     end
 

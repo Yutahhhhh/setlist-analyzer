@@ -27,7 +27,8 @@ class TrackBlueprint < Blueprinter::Base
            :updated_at,
            :cover_mime_type,
            :user_id,
-           :cover_image_url
+           :cover_image_url,
+           :lyrics
   end
 
   view :list do

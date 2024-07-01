@@ -5,4 +5,5 @@ export type TrackSearchParams = {
   extensions: string;
   genres?: string;
   isAllTracks?: boolean;
+  hasLyricTrack?: boolean;
 }

@@ -10,7 +10,7 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import SGD
 
-MODEL_DIR = os.getenv('MODEL_DIR', '/llm')
+MODEL_DIR = os.getenv('MODEL_DIR', '../llm')
 
 class GenreClassifier:
     def __init__(self, user_id):
@@ -79,19 +79,23 @@ class GenreClassifier:
     def train(self, tracks, incremental):
         df = pd.DataFrame(tracks)
         X = df.drop('genre', axis=1)
-        y = df['genre'].astype('category').cat.codes
-
         if not incremental:
-            self.genre_mapping = {i: genre for i, genre in enumerate(df['genre'].unique())}
-            self.preprocessor = self.initialize_preprocessor()  # Reinitialize to avoid data leakage
+            self.genre_mapping = {genre: i for i, genre in enumerate(df['genre'].unique())}
+            self.preprocessor = self.initialize_preprocessor()
             X_processed = self.preprocessor.fit_transform(X)
+            y = df['genre'].map(self.genre_mapping).values
         else:
-            new_genres = set(df['genre'].unique()) - set(self.genre_mapping.values())
+            new_genres = set(df['genre'].unique()) - set(self.genre_mapping.keys())
             if new_genres:
-                max_index = max(self.genre_mapping.keys(), default=-1)
-                new_mapping = {i + max_index + 1: genre for i, genre in enumerate(new_genres)}
+                max_index = max(self.genre_mapping.values(), default=-1)
+                new_mapping = {genre: i + max_index + 1 for i, genre in enumerate(new_genres)}
                 self.genre_mapping.update(new_mapping)
             X_processed = self.preprocessor.transform(X)
+            y = df['genre'].map(self.genre_mapping).values
+
+        num_classes = len(self.genre_mapping)
+        if self.model and self.model.output_shape[-1] != num_classes:
+            self.adjust_output_layer(num_classes)
 
         if self.model:
             self.model.fit(X_processed, y, epochs=50, batch_size=32, validation_split=0.2)
@@ -103,11 +107,13 @@ class GenreClassifier:
     def adjust_output_layer(self, num_classes):
         current_output_units = self.model.output_shape[-1]
         if num_classes != current_output_units:
+            # 既存の出力層を削除
             self.model.pop()
-            new_output = Dense(num_classes, activation='softmax')
+            new_output = Dense(num_classes, activation='softmax', name=f"dense_output_{num_classes}")
             self.model.add(new_output)
             self.model.compile(optimizer=SGD(learning_rate=0.01, momentum=0.9, nesterov=True),
                                loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
 
     def get_trained_genres(self):
         return list(self.genre_mapping.values())

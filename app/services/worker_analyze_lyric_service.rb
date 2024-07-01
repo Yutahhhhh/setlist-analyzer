@@ -5,7 +5,7 @@ class WorkerAnalyzeLyricService < WorkerService
     headers = { 'Content-Type' => 'application/json' }
     body = { file_path: }.to_json
     # 1本のリクエストに3分以上かかる場合、timeoutを180以上に設定
-    response = post('/workers/lyrics/analyze', body:, headers:, timeout: 300)
+    response = post('/workers/lyrics/analyze', body:, headers:, timeout: 600)
     raise WorkerServiceError, "解析に失敗しました: #{response.code} - #{response.message}" unless response.ok?
 
     res = response.parsed_response

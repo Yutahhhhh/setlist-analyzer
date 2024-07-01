@@ -35,7 +35,6 @@ export const useTrackStore = create<TrackState>((set) => ({
         }
         return t;
       });
-      console.log(newTracks.map((t) => t.id));
       return { tracks: newTracks };
     });
   }

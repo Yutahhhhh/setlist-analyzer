@@ -10,6 +10,7 @@ export interface TrackListRequestParams {
   per: number;
   filename: string;
   extensions: string;
+  genres?: string;
   isAllTracks?: boolean;
 }
 

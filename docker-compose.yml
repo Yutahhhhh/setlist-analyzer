@@ -19,7 +19,6 @@ services:
       - "7300:3000"
     depends_on:
       - db
-      - worker
     tty: true
     stdin_open: true
     command: ./bin/local_rails_start.sh
@@ -28,32 +27,30 @@ services:
       DATABASE_NAME: root
       DATABASE_PASSWORD: password
       MODEL_DIR: /llm
-      WORKER_URL: http://worker:5328
-      REDIS_URL: redis://redis:6379/0
+      WORKER_URL: ${WORKER_URL:-http://worker:5328}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     volumes:
       - .:/usr/src/app
-      - ${AUDIO_PATH}:/audios
-      - ./llm:/llm
+      - ${AUDIO_PATH}:${AUDIO_PATH}
 
-  worker:
-    build:
-      context: .
-      dockerfile: containers/local/worker/Dockerfile
-    ports:
-      - "5328:5328"
-    command: ./bin/local_worker_start.sh
-    tty: true
-    stdin_open: true
-    volumes:
-      - ./workers:/usr/src/app
-      - ./bin:/usr/src/app/bin
-      - ${AUDIO_PATH}:/audios
-      - ./llm:/llm
-      - ./fixtures:/usr/src/app/tests/fixtures/sample
-    environment:
-      MODEL_DIR: /llm
-      TF_CPP_MIN_LOG_LEVEL: 2
-      TF_ENABLE_ONEDNN_OPTS: 0
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: containers/local/worker/Dockerfile
+  #   ports:
+  #     - "5328:5328"
+  #   command: ./bin/local_worker_start.sh
+  #   tty: true
+  #   stdin_open: true
+  #   volumes:
+  #     - ./workers:/usr/src/app
+  #     - ./bin:/usr/src/app/bin
+  #     - ./fixtures:/usr/src/app/tests/fixtures/sample
+  #     - ./llm:/llm
+  #   environment:
+  #     MODEL_DIR: /llm
+  #     TF_CPP_MIN_LOG_LEVEL: 2
+  #     TF_ENABLE_ONEDNN_OPTS: 0
 
   front:
     build:

@@ -68,6 +68,14 @@ class Track < ApplicationRecord
     where(audio_mime_type: mime_types) if mime_types.any?
   }
 
+  scope :by_genres, lambda { |genres|
+    where(genre: genres) if genres.any?
+  }
+
+  scope :has_lyrics, lambda { |has_lyric_track|
+    where(lyrics: nil) unless has_lyric_track
+  }
+
   def cover_image_url
     cover_image.url if cover_image.present?
   end
@@ -82,5 +90,13 @@ class Track < ApplicationRecord
 
   def valid_path?
     File.exist?(path)
+  end
+
+  def self.search(filename:, mime_types:, genres:, has_lyric_track:)
+    s = all
+    s = s.by_filename(filename)
+    s = s.by_mime_types(mime_types)
+    s = s.by_genres(genres)
+    s.has_lyrics(has_lyric_track)
   end
 end

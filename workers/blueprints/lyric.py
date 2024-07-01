@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 import os
+import traceback
 from services.audio_utils import extract_vocal
-from services.lyric_model_util import initialize_whisper_model, audio_to_text, find_phrase_times
+from services.lyric_model_util import audio_to_text, find_phrase_times
 
 lyric_bp = Blueprint("lyric", __name__, url_prefix="/workers/lyrics")
 
@@ -17,17 +18,18 @@ def analyze():
 
     try:
         vocal_file_path = extract_vocal(file_path)
-        whisper_model = initialize_whisper_model()
+        whisper_model = current_app.config['WHISPER_MODEL']
         transcription = audio_to_text(whisper_model, vocal_file_path)
         full_text = " ".join([seg['text'] for seg in transcription['segments']])
         phrase_times = find_phrase_times(transcription['segments'])
 
         # 一時ファイルを削除
-        # os.remove(vocal_file_path)
+        os.remove(vocal_file_path)
 
         return jsonify({
             "phrases": phrase_times,
             "lyrics": full_text
         }), 200
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500

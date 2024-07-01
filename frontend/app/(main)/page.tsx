@@ -13,7 +13,9 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  ButtonGroup
+  ButtonGroup,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { useState } from "react";
 import { useTrackStore } from "@/store/useTrackStore";
@@ -23,28 +25,42 @@ import { TrackSearchParams } from "@/types/common";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { buildURL } from "@/utils/RouterUtil";
-import { startAudioAnalyzeLyrics, destroyAudios } from "@/services/trackApi";
+import {
+  startAudioAnalyzeLyrics,
+  startAudioAnalyzeLyricsBySearch, 
+  destroyAudios,
+} from "@/services/trackApi";
 import { useJobStore } from "@/store/useJobStore";
+import { useGenreStore } from "@/store/useGenreStore";
 
 export default function Home() {
   const router = useRouter();
   const params = useSearchParams();
+  const { allGenres } = useGenreStore();
   const { unshiftJob, setAudioAnalyzeLyricsJob, audioAnalyzeLyricsJob } = useJobStore();
   const [searchParams, setSearchParams] = useState<TrackSearchParams>({
     page: (params.get("page") || 1) as number,
     per: (params.get("per") || 10) as number,
     filename: (params.get("filename") || "") as string,
+    genres: (params.get("genres")
+      ? params.getAll("genres").join(",")
+      : "") as string,
     extensions: (params.get("extensions")
       ? params.getAll("extensions").join(",")
-      : "") as string
+      : "") as string,
+    hasLyricTrack: params.get("hasLyricTrack") === "true",
   });
   const [formParams, setFormParams] = useState<TrackSearchParams>(searchParams);
-  const { currentPage, totalItemCount, isLoading, error } =
-    useTrack(searchParams);
+  const { 
+    currentPage, 
+    totalItemCount, 
+    isLoading: isTrackLoading, 
+    error: trackError 
+  } = useTrack(searchParams);
   const tracks = useTrackStore((state) => state.tracks);
   const isJobRunning = !!audioAnalyzeLyricsJob;
 
-  if (isLoading) {
+  if (isTrackLoading) {
     return (
       <Container>
         <CircularProgress />
@@ -52,10 +68,12 @@ export default function Home() {
     );
   }
 
-  if (error) {
+  if (trackError) {
     return (
       <Container>
-        <Typography color="error">エラー: {error.message}</Typography>
+        <Typography color="error">
+          エラー: {trackError?.message}
+        </Typography>
       </Container>
     );
   }
@@ -69,9 +87,13 @@ export default function Home() {
       page: params?.page || 1,
       per: params?.per || formParams.per,
       filename: formParams.filename,
+      genres: !!params?.arrExts
+        ? params.arrExts.join(",")
+        : formParams.genres,
       extensions: !!params?.arrExts
         ? params.arrExts.join(",")
-        : formParams.extensions
+        : formParams.extensions,
+      hasLyricTrack: formParams.hasLyricTrack,
     };
     router.push(buildURL("/", requestParams));
     setSearchParams(requestParams);
@@ -83,6 +105,18 @@ export default function Home() {
       const jobStatus = await startAudioAnalyzeLyrics(
         tracks.filter((track) => track.isChecked).map((track) => track.id)
       );
+      unshiftJob(jobStatus);
+      setAudioAnalyzeLyricsJob(jobStatus);
+    } catch (error) {
+      console.error("Failed to fetch audio directory:", error);
+      throw error;
+    }
+  }
+
+  const handleAnalyzeLyricsBySearch = async () => {
+    try {
+      if (!confirm("検索条件で歌詞を解析しますか？")) return;
+      const jobStatus = await startAudioAnalyzeLyricsBySearch(searchParams);
       unshiftJob(jobStatus);
       setAudioAnalyzeLyricsJob(jobStatus);
     } catch (error) {
@@ -116,6 +150,34 @@ export default function Home() {
           sx={{ minWidth: 220 }}
         />
         <FormControl sx={{ minWidth: 220 }}>
+          <InputLabel id="genre-label">ジャンル</InputLabel>
+          <Select
+            labelId="genre-label"
+            multiple
+            value={formParams.genres?.split(",").filter(Boolean)}
+            onChange={(e) => {
+              setFormParams({
+                ...formParams,
+                genres: (e.target.value as string[]).join(",") || "",
+              });
+            }}
+            input={<OutlinedInput id="select-multiple-chip" label="ジャンル" />}
+            renderValue={(selected: string[]) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                ))}
+              </Box>
+            )}
+          >
+            {allGenres.map((g) => (
+              <MenuItem key={g} value={g}>
+                {g}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl sx={{ minWidth: 220 }}>
           <InputLabel id="file-extension-label">拡張子</InputLabel>
           <Select
             labelId="file-extension-label"
@@ -144,34 +206,61 @@ export default function Home() {
             ))}
           </Select>
         </FormControl>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={formParams.hasLyricTrack as boolean}
+              onChange={(e) => {
+                setFormParams({
+                  ...formParams,
+                  hasLyricTrack: e.target.checked,
+                });
+              }}
+            />
+          }
+          label="歌詞解析済みデータを含める"
+        />
         <Button variant="contained" onClick={() => handleSearch()}>
           検索
         </Button>
       </Box>
 
-      {tracks.filter((track) => track.isChecked).length > 0 && (
-        <Box m={2} display="flex" justifyContent="end" alignContent="center">
-          <Typography my="auto" px={2}>
-            選択中: {tracks.filter((track) => track.isChecked).length}曲
-          </Typography>
-          <ButtonGroup variant="outlined" aria-label="Loading button group">
-            <Button
-              onClick={handleAnalyzeLyrics}
-              disabled={isJobRunning}
-              startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
-            >
-              歌詞解析
-            </Button>
-            <Button
-              onClick={handleDeleteTracks}
-              disabled={isJobRunning}
-              startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
-            >
-              削除
-            </Button>
-          </ButtonGroup>
-        </Box>
-      )}
+      <Box m={2} display="flex" justifyContent="end" alignContent="center">
+        <Typography variant="h6" component="h2" sx={{ flexGrow: 1 }}>
+          選択中の{tracks.filter((track) => track.isChecked).length}曲から
+        </Typography>
+        <ButtonGroup variant="contained" aria-label="Basic button group">
+          <Button
+            onClick={handleAnalyzeLyrics}
+            disabled={isJobRunning}
+            startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
+          >
+            歌詞解析
+          </Button>
+          <Button
+            onClick={handleDeleteTracks}
+            disabled={isJobRunning}
+            startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
+          >
+            削除
+          </Button>
+        </ButtonGroup>
+      </Box>
+
+      <Box m={2} display="flex" justifyContent="end" alignContent="center">
+        <Typography variant="h6" component="h2" sx={{ flexGrow: 1 }}>
+          検索条件から
+        </Typography>
+        <ButtonGroup variant="contained" aria-label="Basic button group">
+          <Button
+            onClick={handleAnalyzeLyricsBySearch}
+            disabled={isJobRunning}
+            startIcon={isJobRunning ? <CircularProgress size={24} /> : null}
+          >
+            歌詞解析
+          </Button>
+        </ButtonGroup>
+      </Box>
 
       <TrackTable
         tracks={tracks}

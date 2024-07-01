@@ -10,8 +10,10 @@ import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import { postTrainGenre } from "@/services/genreTrainApi";
 import { useJobStore } from "@/store/useJobStore";
+import { useGenreStore } from "@/store/useGenreStore";
 
 export default function Train() {
+  const { allGenres } = useGenreStore();
   const { allJobs, setAudioGenreJob, unshiftJob } = useJobStore();
   const genreJob = useMemo(() => {
     return allJobs.find((job) => job.jobType === "audio_genre_train");
@@ -66,19 +68,11 @@ export default function Train() {
               />
               <StatusBtn />
             </ListItem>
-            
+
             {model.job && (
-              <Stack 
-                direction="row"
-                spacing={1} 
-                flexWrap="wrap"
-              >
-                {model.job.trainData.map((v, index) => (
-                  <Chip 
-                    key={index} 
-                    label={v}
-                    size="small"
-                  />
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                {allGenres.map((v, index) => (
+                  <Chip key={index} label={v} size="small" />
                 ))}
               </Stack>
             )}

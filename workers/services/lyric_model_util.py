@@ -1,15 +1,10 @@
-import whisper
-import tensorflow as tf
-
-# Warnが出るもののクリティカルな問題ではないため、ログレベルを下げる
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-
-def initialize_whisper_model():
-    model = whisper.load_model("base")
-    return model
+import librosa
+import numpy as np
 
 def audio_to_text(model, file_path):
-    result = model.transcribe(file_path, verbose=True)
+    audio, _ = librosa.load(file_path, sr=None)
+    audio = np.float32(audio)
+    result = model.transcribe(audio, verbose=True)
     return result
 
 def find_phrase_times(segments):

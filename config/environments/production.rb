@@ -101,7 +101,7 @@ Rails.application.configure do
 
   config.llm_base_dir = ENV['MODEL_DIR']
 
-  config.audio_base_dir = '/audios'
+  config.audio_base_dir = ENV['AUDIO_PATH']
 
   config.worker_url = ENV['WORKER_URL']
 end

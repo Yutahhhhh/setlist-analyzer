@@ -11,7 +11,8 @@ import {
   IconButton,
   Typography,
   Box,
-  Checkbox
+  Checkbox,
+  Button
 } from "@mui/material";
 import Image from "next/image";
 import { PageTrackList, ITrack } from "@/interfaces/tracks";
@@ -20,6 +21,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { findAudioUrl } from "@/services/audioApi";
 import Track from "@/models/tracks";
+import LyricsModal from "@/components/tracks/LyricsModal";
 
 interface TrackTableProps extends PageTrackList {
   per: number;
@@ -70,10 +72,7 @@ const TrackTable: React.FC<TrackTableProps> = ({
           {tracks.map((track, index) => (
             <TableRow key={index}>
               {showSelect && (
-                <TableCell
-                  align="center"
-                  style={{ width: 48 }}
-                >
+                <TableCell align="center" style={{ width: 48 }}>
                   <Checkbox
                     checked={track.isChecked}
                     onChange={(e) => setChecked(track, e.target.checked)}
@@ -122,6 +121,15 @@ const TrackTable: React.FC<TrackTableProps> = ({
                   <Typography variant="caption">{track.artist}</Typography>
                 </>
                 <Typography variant="caption">{track.underCell}</Typography>
+              </TableCell>
+              <TableCell align="center">
+                <Typography variant="caption">
+                  {track.hasLyrics ? (
+                    <LyricsModal lyrics={track.lyrics} />
+                  ) : (
+                    <Typography variant="caption">歌詞なし</Typography>
+                  )}
+                </Typography>
               </TableCell>
             </TableRow>
           ))}

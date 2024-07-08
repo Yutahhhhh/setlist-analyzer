@@ -4,6 +4,7 @@ This module configures the Flask application and its routes.
 
 import os
 import sys
+import whisper
 
 from flask import Flask
 
@@ -18,6 +19,13 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 sys.dont_write_bytecode = True
 
 
+def load_whisper_model():
+    """
+    Load and return the Whisper model.
+    """
+    return whisper.load_model("base")
+
+
 def create_app():
     """
     Create and configure the Flask application instance.
@@ -27,6 +35,7 @@ def create_app():
     """
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config["WHISPER_MODEL"] = load_whisper_model()
 
     app.register_blueprint(feature_bp)
     app.register_blueprint(genre_bp)

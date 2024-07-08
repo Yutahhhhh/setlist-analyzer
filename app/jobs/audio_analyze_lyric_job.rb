@@ -10,6 +10,7 @@ class AudioAnalyzeLyricJob < AudioCableBaseJob
   end
 
   def job_process(files, job_status, _batch_index)
+    sleep 3
     @track = Track.find_by(path: files.first, user_id: job_status.user_id)
     raise ArgumentError, 'Track not found' if @track.nil? || !@track.valid_path?
 
@@ -27,11 +28,13 @@ class AudioAnalyzeLyricJob < AudioCableBaseJob
   private
 
   def process_results(phrases, lyrics)
-    @track.track_phrases_attributes = phrases.map do |phrase|
+    @track.track_phrases_attributes = phrases.filter_map do |phrase|
+      next if phrase[:phrase].blank?
+
       {
         start_time: phrase[:start].to_f,
         end_time: phrase[:end].to_f,
-        phrase: phrase[:phrase]
+        phrase: phrase[:phrase].truncate(255)
       }
     end
     @track.lyrics = lyrics

@@ -5,7 +5,7 @@ module Api
     def create
       target_files = current_user.tracks.where.not(genre: nil).pluck(:path)
       job_status = schedule_genre_train_job(target_files)
-      render json: JobStatusBlueprint.render(job_status, view: :with_train_data), status: :ok
+      render json: JobStatusBlueprint.render(job_status), status: :ok
     end
 
     private

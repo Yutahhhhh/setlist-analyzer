@@ -18,8 +18,8 @@ export const getTracks = async (params: TrackListRequestParams): Promise<PageTra
 export const getGenres = async (): Promise<string[]> => {
   const axiosInstance = axiosWithAuth();
   try {
-    const response = await axiosInstance.get<string[]>(`${CONTROLLER_PATH}/genres`);
-    return response.data;
+    const response = await axiosInstance.get<{ genres: string[] }>(`${CONTROLLER_PATH}/genres`);
+    return response.data.genres;
   } catch (error) {
     console.error('Failed to get genres:', error);
     throw error;
@@ -50,7 +50,34 @@ export const startAudioAnalysis = async ({
 export const startAudioAnalyzeLyrics = async (ids: number[]): Promise<JobStatus> => {
   const axiosInstance = axiosWithAuth();
   try {
-    const response = await axiosInstance.post<IJobStatus>(`${CONTROLLER_PATH}/analyze_lyrics`, { ids });
+    const response = await axiosInstance.post<IJobStatus>(`${CONTROLLER_PATH}/analyze_lyrics`, { 
+      lyrics: {
+        ids: ids,
+        analyze_type: 'ids',
+        search_params: {},
+      }
+    });
+    return new JobStatus(response.data);
+  } catch (error) {
+    console.error('Failed to fetch audio directory:', error);
+    throw error;
+  }
+}
+
+export const startAudioAnalyzeLyricsBySearch = async (params: TrackListRequestParams): Promise<JobStatus> => {
+  const axiosInstance = axiosWithAuth();
+  try {
+    const response = await axiosInstance.post<IJobStatus>(`${CONTROLLER_PATH}/analyze_lyrics`, { 
+      lyrics: {
+        ids: [],
+        search_params: { 
+          filename: params.filename,
+          extensions: params.extensions,
+          genres: params.genres,
+        },
+        analyze_type: 'search',
+      }
+    });
     return new JobStatus(response.data);
   } catch (error) {
     console.error('Failed to fetch audio directory:', error);

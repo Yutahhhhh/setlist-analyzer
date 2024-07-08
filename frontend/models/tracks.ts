@@ -103,4 +103,8 @@ export default class Track extends Model {
   get underCell(): string {
     return [this.album, this.genre].filter((v) => v).join(' - ');
   }
+
+  get hasLyrics(): boolean {
+    return !!this.lyrics;
+  }
 }

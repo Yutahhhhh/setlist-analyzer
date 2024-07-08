@@ -19,7 +19,6 @@ services:
       - "7300:3000"
     depends_on:
       - db
-      - worker
     tty: true
     stdin_open: true
     command: ./bin/local_rails_start.sh
@@ -28,12 +27,11 @@ services:
       DATABASE_NAME: root
       DATABASE_PASSWORD: password
       MODEL_DIR: /llm
-      WORKER_URL: http://worker:5328
-      REDIS_URL: redis://redis:6379/0
+      WORKER_URL: ${WORKER_URL:-http://worker:5328}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     volumes:
       - .:/usr/src/app
-      - ${AUDIO_PATH}:/audios
-      - ./llm:/llm
+      - ${AUDIO_PATH}:${AUDIO_PATH}
 
   worker:
     build:
@@ -47,9 +45,8 @@ services:
     volumes:
       - ./workers:/usr/src/app
       - ./bin:/usr/src/app/bin
-      - ${AUDIO_PATH}:/audios
-      - ./llm:/llm
       - ./fixtures:/usr/src/app/tests/fixtures/sample
+      - ./llm:/llm
     environment:
       MODEL_DIR: /llm
       TF_CPP_MIN_LOG_LEVEL: 2

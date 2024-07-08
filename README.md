@@ -29,13 +29,27 @@ git clone https://github.com/Yutahhhhh/setlist-analyzer.git
 docker-compose up --build
 ```
 
+workers（flask）はとてつもなく処理が重いため、ホストマシン上での立ち上げを推奨。
+※ docker-compose.ymlのworkerをコメントアウト
+```
+cd workers
+python3 -m venv venv
+source venv/bin/activate
+./venv/bin/python -m flask run --host=0.0.0.0 --port=5328 --debugger --reload
+```
+
 3. 環境変数の設定
 
 .env.template をコピーして .env ファイルを作成し、解析対象の（オーディオファイルが含まれる）ディレクトリを指定
 ※ 許可されている拡張子は ".mp3", ".wav", ".flac", ".ogg"
 
-Apple Silicon系のMacを使用している場合を前提に構成されています。Intelの場合、以下の環境変数を適切なものに設定してください。
-`PLATFORM=xxx`
+```
+# env.template
+
+AUDIO_PATH=/Users/xxx/music/
+WORKER_URL=http://host.docker.internal:5328 # ホストマシン上で立ち上げる場合
+REDIS_URL=redis://redis:6379/0
+```
 
 ## CMD
 
@@ -44,4 +58,5 @@ Apple Silicon系のMacを使用している場合を前提に構成されてい�
 - コードフォーマット: `./devtools/run_all_format`
 - 単体テスト: `./devtools/run_all_test`
 
+※ テスト実行は全てdocker上で起動している必要がある
 

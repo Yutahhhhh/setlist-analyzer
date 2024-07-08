@@ -10,7 +10,7 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import SGD
 
-MODEL_DIR = os.getenv('MODEL_DIR', '/llm')
+MODEL_DIR = os.getenv('MODEL_DIR', '../llm')
 
 class GenreClassifier:
     def __init__(self, user_id):

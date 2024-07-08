@@ -33,24 +33,24 @@ services:
       - .:/usr/src/app
       - ${AUDIO_PATH}:${AUDIO_PATH}
 
-  # worker:
-  #   build:
-  #     context: .
-  #     dockerfile: containers/local/worker/Dockerfile
-  #   ports:
-  #     - "5328:5328"
-  #   command: ./bin/local_worker_start.sh
-  #   tty: true
-  #   stdin_open: true
-  #   volumes:
-  #     - ./workers:/usr/src/app
-  #     - ./bin:/usr/src/app/bin
-  #     - ./fixtures:/usr/src/app/tests/fixtures/sample
-  #     - ./llm:/llm
-  #   environment:
-  #     MODEL_DIR: /llm
-  #     TF_CPP_MIN_LOG_LEVEL: 2
-  #     TF_ENABLE_ONEDNN_OPTS: 0
+  worker:
+    build:
+      context: .
+      dockerfile: containers/local/worker/Dockerfile
+    ports:
+      - "5328:5328"
+    command: ./bin/local_worker_start.sh
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./workers:/usr/src/app
+      - ./bin:/usr/src/app/bin
+      - ./fixtures:/usr/src/app/tests/fixtures/sample
+      - ./llm:/llm
+    environment:
+      MODEL_DIR: /llm
+      TF_CPP_MIN_LOG_LEVEL: 2
+      TF_ENABLE_ONEDNN_OPTS: 0
 
   front:
     build:

@@ -1,3 +1,4 @@
+import shutil
 from flask import Blueprint, jsonify, request, current_app
 import os
 import traceback
@@ -17,14 +18,17 @@ def analyze():
         return jsonify({"error": "File does not exist"}), 404
 
     try:
-        vocal_file_path = extract_vocal(file_path)
+        vocal_file_path, output_dir = extract_vocal(file_path)
         whisper_model = current_app.config['WHISPER_MODEL']
         transcription = audio_to_text(whisper_model, vocal_file_path)
         full_text = " ".join([seg['text'] for seg in transcription['segments']])
         phrase_times = find_phrase_times(transcription['segments'])
 
-        # 一時ファイルを削除
-        os.remove(vocal_file_path)
+        # 一時ファイルとディレクトリを削除
+        if os.path.exists(vocal_file_path):
+            os.remove(vocal_file_path)
+        if output_dir and os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
 
         return jsonify({
             "phrases": phrase_times,

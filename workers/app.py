@@ -18,11 +18,13 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 sys.dont_write_bytecode = True
 
+
 def load_whisper_model():
     """
     Load and return the Whisper model.
     """
     return whisper.load_model("base")
+
 
 def create_app():
     """
@@ -33,7 +35,7 @@ def create_app():
     """
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['WHISPER_MODEL'] = load_whisper_model()
+    app.config["WHISPER_MODEL"] = load_whisper_model()
 
     app.register_blueprint(feature_bp)
     app.register_blueprint(genre_bp)

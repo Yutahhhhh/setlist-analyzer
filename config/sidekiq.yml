@@ -1,6 +1,6 @@
 :concurrency: 5
 :queues:
-  - [long_running, 1]
+  - [long_running, 5]
   - [default, 5]
 :retry: 3
 :limits:

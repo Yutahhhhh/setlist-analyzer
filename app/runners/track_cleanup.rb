@@ -2,17 +2,22 @@
 
 # bundle exec rails r TrackCleanup.apply
 
-class TrackCleanup
+require 'csv'
+
+class Backup
   def self.apply
-    Track.where.not(md5: nil)
-         .group(:md5)
-         .having('count(*) > 1')
-         .pluck(:md5)
-         .each do |md5|
-      # 一番最初のレコード以外を削除
-      tracks_to_remove = Track.where(md5:).offset(1)
-      Rails.logger.info("Removing #{tracks_to_remove.count} duplicate tracks for MD5: #{md5}")
-      tracks_to_remove.destroy_all
+    tables = ActiveRecord::Base.connection.tables
+
+    tables.each do |table_name|
+      file_name = "#{table_name}.csv"
+      CSV.open(file_name, 'w') do |csv|
+        columns = ActiveRecord::Base.connection.columns(table_name).map(&:name)
+        csv << columns
+        rows = ActiveRecord::Base.connection.select_all("SELECT * FROM #{table_name}")
+        rows.each do |row|
+          csv << row.values
+        end
+      end
     end
   end
 end

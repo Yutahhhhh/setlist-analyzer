@@ -10,6 +10,7 @@ class AudioAnalyzeLyricJob < AudioCableBaseJob
   end
 
   def job_process(files, job_status, _batch_index)
+    sleep 3
     @track = Track.find_by(path: files.first, user_id: job_status.user_id)
     raise ArgumentError, 'Track not found' if @track.nil? || !@track.valid_path?
 

@@ -29,6 +29,7 @@ const LINKS: { text: string; href: string; icon: React.ReactNode }[] = [
   { text: "登録済み", href: "/", icon: <MusicIcon /> },
   { text: "ファイル一覧", href: "/list/", icon: <ListIcon /> },
   { text: "トレーニング", href: "/train/", icon: <ModelTrainingIcon /> },
+  { text: "セットリスト", href: "/setlist/", icon: <ListIcon /> },
 ];
 
 interface Props {

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Next.jsのポート解放
+FRONTEND_PORT=7301
+lsof -ti:$FRONTEND_PORT | xargs kill -9
+
+cd frontend
+yarn install
+yarn dev

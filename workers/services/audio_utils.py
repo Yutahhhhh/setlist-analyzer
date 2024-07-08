@@ -143,6 +143,7 @@ def generate_md5(file_path):
         with open(file_path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
+        
         return hash_md5.hexdigest()
     except Exception as e:
         logging.error(f"Error generating MD5 for {file_path}: {str(e)}")
@@ -152,18 +153,17 @@ def generate_md5(file_path):
 def extract_vocal(file_path):
     try:
         separator = Separator('spleeter:2stems')
-        separator.separate_to_file(file_path, '/tmp')
-        output_path = os.path.join('/tmp', os.path.splitext(os.path.basename(file_path))[0], 'vocals.wav')
-        
+        separator.separate_to_file(file_path, 'tmp')
+        output_dir = os.path.join('tmp', os.path.splitext(os.path.basename(file_path))[0])
+        output_path = os.path.join(output_dir, 'vocals.wav')
         if not os.path.exists(output_path):
             raise FileNotFoundError("Vocal track not found after separation.")
         
-        return output_path
+        return output_path, output_dir
 
     except Exception as e:
         # エラーが発生した場合、元のファイルをコピーして返す
-        temp_path = os.path.join('/tmp', os.path.basename(file_path))
+        temp_path = os.path.join('tmp', os.path.basename(file_path))
         shutil.copy(file_path, temp_path)
         logging.error(f"Failed to extract vocals from {file_path}: {e}")
-        return temp_path
-        
+        return temp_path, None

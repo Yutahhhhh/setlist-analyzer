@@ -1,5 +1,10 @@
+import librosa
+import numpy as np
+
 def audio_to_text(model, file_path):
-    result = model.transcribe(file_path, verbose=True)
+    audio, _ = librosa.load(file_path, sr=None)
+    audio = np.float32(audio)
+    result = model.transcribe(audio, verbose=True)
     return result
 
 def find_phrase_times(segments):

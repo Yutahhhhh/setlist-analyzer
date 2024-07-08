@@ -1,0 +1,12 @@
+#!/bin/bash
+
+export FLASK_APP=app
+export FLASK_ENV=development
+
+# Flaskのポート解放
+FLASK_PORT=5328
+lsof -ti:$FLASK_PORT | xargs kill -9
+
+cd workers
+source venv/bin/activate
+./venv/bin/python3.9 -m flask run --host=0.0.0.0 --port=$FLASK_PORT --debugger --reload

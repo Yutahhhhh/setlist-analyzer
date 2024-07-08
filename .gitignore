@@ -8,6 +8,8 @@
 
 .byebug_history
 
+backups/**
+
 # Ignore bundler config.
 /.bundle
 
@@ -39,6 +41,7 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
+/workers/tmp/*
 /workers/pretrained_models/*
 /workers/logs/*
 /workers/venv/*

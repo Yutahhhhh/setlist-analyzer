@@ -1,0 +1,15 @@
+#!/bin/bash
+
+export REDIS_URL='redis://localhost:6379/0'
+export WORKER_URL='http://localhost:5328'
+
+# Railsサーバーのポート解放
+PORT=7300
+lsof -ti:$PORT | xargs kill -9
+
+bundle exec rails db:create
+bundle exec rails ridgepole:apply
+bundle exec rails db:seed
+
+bundle exec sidekiq -C config/sidekiq.yml &
+bundle exec rails s

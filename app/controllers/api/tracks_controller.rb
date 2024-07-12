@@ -19,7 +19,7 @@ module Api
 
     def genres
       render json: {
-        genres: current_user.tracks.pluck(:genre).uniq
+        genres: current_user.tracks.where.not(genre: nil).pluck(:genre).uniq
       }, status: :ok
     end
 
@@ -55,6 +55,18 @@ module Api
       render json: {}, status: :ok
     end
 
+    def recommend
+      track = current_user.tracks.find(recommend_params[:id])
+      tracks = track.recommendations
+      paginated_files = paginate_tracks(tracks, recommend_params[:page] || 1, recommend_params[:per] || 10)
+      render json: TrackBlueprint.render({
+                                           total_item_count: tracks.count,
+                                           total_pages: paginated_files.total_pages,
+                                           current_page: paginated_files.current_page,
+                                           tracks: paginated_files
+                                         }, view: :list)
+    end
+
     private
 
     def analyze_params
@@ -68,6 +80,10 @@ module Api
     def lyrics_params
       params.require(:lyrics).permit(:analyze_type, ids: [],
                                                     search_params: %i[filename extensions genres has_lyric_track])
+    end
+
+    def recommend_params
+      params.permit(:id, :page, :per)
     end
 
     def destroy_params

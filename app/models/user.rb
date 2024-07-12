@@ -43,6 +43,7 @@ class User < ApplicationRecord
 
   has_many :tracks, dependent: :destroy
   has_many :job_statuses, dependent: :destroy
+  has_many :setlists, dependent: :destroy
   validates :password, presence: true
   validates :email, uniqueness: { scope: :provider }
 

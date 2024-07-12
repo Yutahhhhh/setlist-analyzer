@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       post :analyze_lyrics, on: :collection
       get :genres, on: :collection
     end
+    resources :setlists, only: %i[index create update destroy]
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

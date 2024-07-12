@@ -14,6 +14,7 @@ module AudioUtil
   end
 
   def self.read_audio_directory(filename: nil, extensions: nil, exclude_paths: [])
+    puts "@@@@@@@@@@@@ROOT_DIR: #{Dir.glob(File.join(ROOT_DIR, '**', '*')).count}"
     all_files = Dir.glob(File.join(ROOT_DIR, '**', '*'))
                    .select { |file| EXTENSION_TO_MIME_TYPE_MAP.key?(File.extname(file).downcase) }
                    .reject { |file| exclude_paths.include?(file) }

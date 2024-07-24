@@ -29,14 +29,14 @@ const LINKS: { text: string; href: string; icon: React.ReactNode }[] = [
   { text: "登録済み", href: "/", icon: <MusicIcon /> },
   { text: "ファイル一覧", href: "/list/", icon: <ListIcon /> },
   { text: "トレーニング", href: "/train/", icon: <ModelTrainingIcon /> },
-  { text: "セットリスト", href: "/setlist/", icon: <ListIcon /> },
+  { text: "セットリスト", href: "/setlists/", icon: <ListIcon /> },
 ];
 
 interface Props {
   children: React.ReactNode;
 }
 
-const ResponsiveDrawer: React.FC<Props> = (props: Props) => {
+const ResponsiveDrawer = (props: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const { allJobs } = useJobStore();

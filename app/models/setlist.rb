@@ -17,9 +17,12 @@
 #  index_setlists_on_user_id  (user_id)
 #
 class Setlist < ApplicationRecord
-  has_many :setlist_tracks, dependent: :destroy
+  belongs_to :user
+  has_many :setlist_tracks, dependent: :delete_all
   has_many :tracks, through: :setlist_tracks
 
-  validates :genre_name, :setlist_name, presence: true
+  accepts_nested_attributes_for :setlist_tracks, allow_destroy: true
+
+  validates :name, presence: true
   validates :rating, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
 end

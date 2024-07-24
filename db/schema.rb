@@ -20,7 +20,7 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.text "message", comment: "メッセージ（エラーメッセージや進捗など）"
     t.datetime "started_at", comment: "開始時刻"
     t.datetime "finished_at", comment: "終了時刻"
-    t.text "result", comment: "結果や出力内容"
+    t.json "target", comment: "対象"
     t.integer "retry_count", default: 0, comment: "再試行回数"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -60,13 +60,12 @@ ActiveRecord::Schema[7.1].define(version: 0) do
 
   create_table "track_transitions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", comment: "楽曲の切り替えタイミングを保持するテーブル", force: :cascade do |t|
     t.bigint "user_id", comment: "ユーザーID"
-    t.integer "prev_track_id", null: false, comment: "前のセットリストの楽曲ID（setlist_tracksテーブルの外部キー）"
-    t.integer "next_track_id", null: false, comment: "次のセットリストの楽曲ID（setlist_tracksテーブルの外部キー）"
+    t.bigint "setlist_track_id", null: false, comment: "対象のセットリストの楽曲"
     t.integer "transition_time", null: false, comment: "切り替えタイミングの秒数"
     t.string "transition_type", null: false, comment: "切り替え方法（文字で表記）"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["prev_track_id", "next_track_id", "user_id"], name: "idx_on_prev_track_id_next_track_id_user_id_d0ab34b927"
+    t.index ["setlist_track_id", "user_id"], name: "index_track_transitions_on_setlist_track_id_and_user_id"
   end
 
   create_table "tracks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", comment: "解析したトラックの情報を保持するテーブル", force: :cascade do |t|
@@ -94,9 +93,9 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.integer "mode", comment: "曲のモード（1:メジャー、0:マイナー、1は明るい感じ、0は暗い感じを示す）"
     t.integer "time_signature", comment: "曲の拍子記号（1小節あたりの拍数、一般的に2, 3, 4, 6など）"
     t.integer "measure", comment: "小節数（曲の構造に基づく整数値）"
+    t.float "duration", comment: "再生時間（秒、曲の長さを秒単位で示す）"
     t.string "path", null: false, comment: "音楽ファイルのパス"
     t.text "lyrics", comment: "歌詞"
-    t.float "duration", comment: "再生時間（秒、曲の長さを秒単位で示す）"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_tracks_on_path", unique: true

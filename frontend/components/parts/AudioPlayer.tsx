@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Box, IconButton, Slider, Stack, Typography, styled, useTheme } from "@mui/material";
 import { PlayArrowRounded, PauseRounded, FastForwardRounded, FastRewindRounded, VolumeDownRounded, VolumeUpRounded } from "@mui/icons-material";
-import { AudioInfo } from "@/interfaces/audios";
+import { ITrack as AudioInfo } from "@/models/tracks";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import Image from "next/image";
 
@@ -76,7 +76,9 @@ interface AudioPlayerProps {
   audioInfo: AudioInfo;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioInfo }) => {
+const AudioPlayer = ({
+  audioInfo,
+}: AudioPlayerProps) => {
   const [paused, setPaused] = useState(true);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -86,9 +88,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioInfo }) => {
 
   const mainIconColor = theme.palette.mode === "dark" ? "#fff" : "#000";
   const lightIconColor =
-    theme.palette.mode === "dark"
-      ? "rgba(255,255,255,0.4)"
-      : "rgba(0,0,0,0.4)";
+    theme.palette.mode === "dark" ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
 
   useDeepCompareEffect(() => {
     if (audioRef.current) {

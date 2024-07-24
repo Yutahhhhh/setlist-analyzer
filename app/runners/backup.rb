@@ -6,7 +6,7 @@ require 'csv'
 
 class Backup
   BACKUP_DIR = 'backups'
-  TARGET_MODELS = [Track, User, TrackPhrase, TrackTransition, Setlist, SetlistTrack].freeze
+  TARGET_MODELS = [Track, User, TrackPhrase, Setlist, SetlistTrack].freeze
 
   def self.apply
     TARGET_MODELS.each do |model|

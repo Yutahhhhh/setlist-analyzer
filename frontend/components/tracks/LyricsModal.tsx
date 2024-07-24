@@ -6,12 +6,13 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
+import MicIcon from "@mui/icons-material/Mic";
 
 interface LyricsModalProps {
   lyrics: string;
 }
 
-const LyricsModal: React.FC<LyricsModalProps> = ({ lyrics }: LyricsModalProps) => {
+const LyricsModal = ({ lyrics }: LyricsModalProps) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const onClose = () => {
@@ -32,7 +33,9 @@ const LyricsModal: React.FC<LyricsModalProps> = ({ lyrics }: LyricsModalProps) =
           </Typography>
         </DialogContent>
       </Dialog>
-      <Button onClick={() => setOpen(true)}>歌詞を表示</Button>
+      <Button onClick={() => setOpen(true)}>
+        <MicIcon />
+      </Button>
     </>
   );
 };

@@ -28,7 +28,20 @@ class TrackBlueprint < Blueprinter::Base
            :cover_mime_type,
            :user_id,
            :cover_image_url,
-           :lyrics
+           :md5
+  end
+
+  view :with_phrases do
+    include_view :show
+    field :phrases do |track, options|
+      if options[:phrase].present?
+        track.track_phrases.map do |phrase|
+          TrackPhraseBlueprint.render_as_hash(phrase)
+        end
+      else
+        []
+      end
+    end
   end
 
   view :list do

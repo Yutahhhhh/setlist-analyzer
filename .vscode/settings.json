@@ -14,5 +14,8 @@
       "password": "",
       "connectString": "mysql://root:@localhost:7306/mysql"
     }
-  ]
+  ],
+  "github.copilot.advanced": {
+    
+  }
 }

@@ -2,53 +2,66 @@
 import {
   TableContainer,
   Paper,
-  Table,
-  TableBody,
   TableRow,
+  TableHead,
+  Table,
   TableCell,
-  TableFooter,
-  TablePagination,
-  IconButton,
   Typography,
   Box,
-  Checkbox,
-  Button
 } from "@mui/material";
-import Image from "next/image";
+
+import { TableComponents, TableVirtuoso } from "react-virtuoso";
 import { PageTrackList, ITrack } from "@/interfaces/tracks";
 import { useTrackStore } from "@/store/useTrackStore";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PauseIcon from "@mui/icons-material/Pause";
 import { findAudioUrl } from "@/services/audioApi";
 import Track from "@/models/tracks";
-import LyricsModal from "@/components/tracks/LyricsModal";
+import { forwardRef } from "react";
+import {
+  MultiSelectItemContent,
+  FromSelectItemContent,
+  ToSelectItemContent,
+  BaseItemContent,
+} from "@/components/tracks/tables/ItemContent";
+import {
+  MultiSelectHeader, SelectHeader, BaseHeader
+} from "@/components/tracks/tables/TableHeaders";
+import TableFooter from "@/components/tracks/tables/TableFooter";
+import { useTrackTableStore } from "@/store/useTrackTableStore";
+
+const Scroller = forwardRef<HTMLDivElement, any>((props, ref) => (
+  <TableContainer component={Paper} {...props} ref={ref} />
+));
+Scroller.displayName = "Scroller";
 
 interface TrackTableProps extends PageTrackList {
   per: number;
   page: number;
   tracks: Track[];
-  showSelect?: boolean;
-  handleChangePage: (
+  tableType?: "nomal" | "multiSelect" | "fromSelect" | "toSelect";
+  small?: boolean;
+  recommendTarget?: Track | null;
+  handleChangePage?: (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => void;
-  handleChangeRowsPerPage: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+  handleCustomAction?: (track: Track) => void;
+  handleClickRow?: (track: Track) => void;
+  tableHeight?: number;
 }
 
-const TrackTable: React.FC<TrackTableProps> = ({
+const TrackTable = ({
   tracks,
   totalItemCount,
   per,
   page,
-  handleChangePage,
-  handleChangeRowsPerPage,
-  showSelect = false,
-}) => {
-  const { currentTrack, setTrack, isPlaying, togglePlay, setChecked } =
-    useTrackStore();
-  const columnCount = showSelect ? 3 : 2; // チェックボックスが表示される場合は3列、そうでない場合は2列
+  handleChangePage = () => {},
+  handleCustomAction = () => {},
+  handleClickRow = () => {},
+  tableType = "nomal",
+  recommendTarget,
+  tableHeight = 500,
+}: TrackTableProps) => {
+  const { currentTrack, setTrack, isPlaying, togglePlay } = useTrackStore();
 
   const handlePlayPause = async (track: ITrack) => {
     if (currentTrack && currentTrack.path === track.path) {
@@ -66,89 +79,108 @@ const TrackTable: React.FC<TrackTableProps> = ({
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-        <TableBody>
-          {tracks.map((track, index) => (
-            <TableRow key={index}>
-              {showSelect && (
-                <TableCell align="center" style={{ width: 48 }}>
-                  <Checkbox
-                    checked={track.isChecked}
-                    onChange={(e) => setChecked(track, e.target.checked)}
-                  />
-                </TableCell>
-              )}
-              <TableCell align="center" style={{ width: 48 }}>
-                <Box
-                  width={48}
-                  height={48}
-                  position="relative"
-                  display="inline-block"
-                >
-                  {track.coverImageUrl && (
-                    <Image
-                      src={track.coverImageUrl}
-                      alt="Cover"
-                      width={48}
-                      height={48}
-                    />
-                  )}
-                  <IconButton
-                    onClick={() => handlePlayPause(track)}
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      color: "white",
-                      backgroundColor: "transparent",
-                      "&:hover": { backgroundColor: "rgba(255,255,255,0.3)" },
-                    }}
-                  >
-                    {isPlaying && currentTrack?.path === track.path ? (
-                      <PauseIcon />
-                    ) : (
-                      <PlayArrowIcon />
-                    )}
-                  </IconButton>
-                </Box>
-              </TableCell>
-              <TableCell component="th" scope="row">
+    <Paper style={{ height: tableHeight, width: "100%" }}>
+      <TableVirtuoso
+        data={tracks}
+        fixedHeaderContent={() => {
+          switch (tableType) {
+            case "multiSelect":
+              return <MultiSelectHeader />;
+            case "fromSelect":
+              return <SelectHeader />;
+            case "toSelect":
+              return <SelectHeader />;
+            default:
+              return <BaseHeader />;
+          }
+        }}
+        components={
+          {
+            Scroller,
+            Table: (props) => (
+              <Table
+                {...props}
+                sx={{ borderCollapse: "separate", width: "100%" }}
+              />
+            ),
+            TableHead,
+            TableRow: (props) => {
+              return (
                 <>
-                  <Typography variant="body2">{track.topCell}</Typography>
-                  <Typography variant="caption">{track.artist}</Typography>
+                  <TableRow
+                    {...props}
+                    onClick={() => handleClickRow(props.item)}
+                    sx={{
+                      cursor: "pointer",
+                      color:
+                        props.item.id === recommendTarget?.id
+                          ? "grey"
+                          : "inherit",
+                    }}
+                  />
+                  {props.item.uniqPhrases.map((tp) => (
+                    <TableRow key={tp.id}>
+                      <TableCell
+                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        colSpan={3}
+                      >
+                        <Box sx={{ margin: 1 }}>
+                          <Typography variant="caption">
+                            {tp.startTime}~{tp.endTime}: {tp.phrase}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </>
-                <Typography variant="caption">{track.underCell}</Typography>
-              </TableCell>
-              <TableCell align="center">
-                <Typography variant="caption">
-                  {track.hasLyrics ? (
-                    <LyricsModal lyrics={track.lyrics} />
-                  ) : (
-                    <Typography variant="caption">歌詞なし</Typography>
-                  )}
-                </Typography>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[10, 15, 25]}
-              colSpan={columnCount}
-              count={totalItemCount}
-              rowsPerPage={per}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+              );
+            },
+          } as TableComponents<Track>
+        }
+        itemContent={(_index, track) => {
+          switch (tableType) {
+            case "multiSelect":
+              return (
+                <MultiSelectItemContent
+                  track={track}
+                  isPlaying={currentTrack?.path === track.path && isPlaying}
+                  togglePlayPause={() => handlePlayPause(track)}
+                />
+              );
+            case "fromSelect":
+              return (
+                <FromSelectItemContent
+                  track={track}
+                  isPlaying={currentTrack?.path === track.path && isPlaying}
+                  togglePlayPause={() => handlePlayPause(track)}
+                  handleCustomAction={handleCustomAction}
+                />
+              );
+            case "toSelect":
+              return (
+                <ToSelectItemContent
+                  track={track}
+                  isPlaying={currentTrack?.path === track.path && isPlaying}
+                  togglePlayPause={() => handlePlayPause(track)}
+                  handleCustomAction={handleCustomAction}
+                />
+              );
+            default:
+              return (
+                <BaseItemContent
+                  track={track}
+                  isPlaying={currentTrack?.path === track.path && isPlaying}
+                  togglePlayPause={() => handlePlayPause(track)}
+                />
+              );
+          }
+        }}
+        endReached={() => handleChangePage(null, page + 1)}
+      />
+      {["nomal", "multiSelect"].includes(tableType) && (
+        <TableFooter totalItemCount={totalItemCount} per={per} page={page} />
+      )}
+    </Paper>
   );
 };
 

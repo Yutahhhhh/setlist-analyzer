@@ -20,7 +20,7 @@ import { useTrackStore } from "@/store/useTrackStore";
 import { findAudioUrl } from "@/services/audioApi";
 import Track from "@/models/tracks";
 
-const TrackControlBar: React.FC = () => {
+const TrackControlBar = () => {
   const {
     isPlaying,
     currentTrack,

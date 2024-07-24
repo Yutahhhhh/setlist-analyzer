@@ -8,8 +8,10 @@ interface JobStoreState {
   updateByCable: (job: JobStatus) => void;
   audioGenreJob: JobStatus | null;
   audioAnalyzeLyricsJob: JobStatus | null;
+  audioAnalyzeGenreJob: JobStatus | null;
   setAudioGenreJob: (job: JobStatus) => void;
   setAudioAnalyzeLyricsJob: (job: JobStatus) => void;
+  setAudioAnalyzeGenreJob: (job: JobStatus) => void;
 }
 
 export const useJobStore = create<JobStoreState>((set, get) => ({
@@ -22,6 +24,8 @@ export const useJobStore = create<JobStoreState>((set, get) => ({
   }),
   audioGenreJob: null,
   audioAnalyzeLyricsJob: null,
+  audioAnalyzeGenreJob: null,
   setAudioGenreJob: (audioGenreJob) => set({ audioGenreJob }),
-  setAudioAnalyzeLyricsJob: (audioAnalyzeLyricsJob) => set({ audioAnalyzeLyricsJob })
+  setAudioAnalyzeLyricsJob: (audioAnalyzeLyricsJob) => set({ audioAnalyzeLyricsJob }),
+  setAudioAnalyzeGenreJob: (audioAnalyzeGenreJob) => set({ audioAnalyzeGenreJob }),
 }));

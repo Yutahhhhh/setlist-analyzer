@@ -23,8 +23,6 @@ RSpec.describe Api::AudiosController, type: :request do
   end
   let(:search_params) do
     {
-      page: 1,
-      per: 10,
       filename: '',
       extensions: '',
       is_all_tracks: false
@@ -45,19 +43,6 @@ RSpec.describe Api::AudiosController, type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'オーディオファイルが正しくページネーションされていること' do
-      get api_audios_url, params: search_params, headers: auth_headers
-      actual = JSON.parse(response.body)
-      expect(actual['tracks'].length).to eq(10)
-      expect(actual['totalItemCount']).to eq(mp3_length + wav_length + flac_length)
-      expect(actual['totalPages']).to eq(2)
-      expect(actual['currentPage']).to eq(1)
-
-      get api_audios_url, params: search_params.merge(page: 2), headers: auth_headers
-      actual = JSON.parse(response.body)
-      expect(actual['tracks'].length).to eq(5)
-    end
-
     it '指定されたファイル名でファイルがフィルタリングされること' do
       get api_audios_url, params: search_params.merge(filename: 'test1'), headers: auth_headers
       actual = JSON.parse(response.body)
@@ -66,15 +51,29 @@ RSpec.describe Api::AudiosController, type: :request do
 
     it '`is_all_tracks`がfalseの場合、ユーザーに関連付けられているトラックが除外されること' do
       create(:track, path: audio_files.values.first, user:)
-      get api_audios_url, params: search_params.merge(per: 20), headers: auth_headers
+      get api_audios_url, params: search_params, headers: auth_headers
       actual = JSON.parse(response.body)
       expect(actual['tracks'].length).to eq((mp3_length + wav_length + flac_length) - 1)
+    end
+
+    it '`is_all_tracks`がtrueの場合、ユーザーに関連付けられているトラックが除外されないこと' do
+      create(:track, path: audio_files.values.first, user:)
+      get api_audios_url, params: search_params.merge(is_all_tracks: true), headers: auth_headers
+      actual = JSON.parse(response.body)
+      expect(actual['tracks'].length).to eq(mp3_length + wav_length + flac_length)
     end
 
     it 'サポートされていない拡張子（m4a）のファイルが除外されること' do
       get api_audios_url, params: search_params.merge(extensions: 'm4a'), headers: auth_headers
       actual = JSON.parse(response.body)
       expect(actual['tracks'].length).to eq(0)
+    end
+
+    it 'JobStatusで実行中のジョブがある場合、そのジョブの対象ファイルが除外されること' do
+      create(:audio_analyze_job_status, user:, target: [audio_files.values.first], status: :running)
+      get api_audios_url, params: search_params, headers: auth_headers
+      actual = JSON.parse(response.body)
+      expect(actual['tracks'].length).to eq((mp3_length + wav_length + flac_length) - 1)
     end
   end
 end

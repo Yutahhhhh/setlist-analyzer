@@ -24,23 +24,9 @@ RSpec.describe Track, type: :model do
 
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
-    it { is_expected.to have_many(:setlist_tracks).dependent(:destroy) }
+    it { is_expected.to have_many(:setlist_tracks).dependent(:delete_all) }
     it { is_expected.to have_many(:setlists).through(:setlist_tracks) }
-    it { is_expected.to have_many(:track_phrases).dependent(:destroy) }
-
-    it {
-      expect(track).to have_many(:prev_transitions)
-        .class_name('TrackTransition')
-        .with_foreign_key('prev_track_id')
-        .dependent(:destroy)
-    }
-
-    it {
-      expect(track).to have_many(:next_transitions)
-        .class_name('TrackTransition')
-        .with_foreign_key('next_track_id')
-        .dependent(:destroy)
-    }
+    it { is_expected.to have_many(:track_phrases).dependent(:delete_all) }
   end
 
   describe '#cover_image_url' do

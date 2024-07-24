@@ -8,7 +8,6 @@ class JobStatusBlueprint < Blueprinter::Base
          :user_id,
          :message,
          :progress,
-         :result,
          :retry_count,
          :started_at,
          :finished_at,

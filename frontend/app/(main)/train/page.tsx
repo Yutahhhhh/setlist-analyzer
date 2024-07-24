@@ -37,7 +37,7 @@ export default function Train() {
     }
   }
 
-  const StatusBtn: React.FC = () => {
+  const StatusBtn = () => {
     switch (genreJob?.status) {
       case 'running':
         return <CircularProgress size={24} />;

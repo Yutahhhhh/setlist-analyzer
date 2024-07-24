@@ -8,7 +8,7 @@ interface JobAlertProps {
   job: JobStatus;
 }
 
-const JobAlert: React.FC<JobAlertProps> = ({ job }) => {
+const JobAlert = ({ job }: JobAlertProps) => {
   const [watchedJobStatus, setWatchedJobStatus] = useState(job);
   const { updateByCable } = useJobStore();
 
@@ -33,7 +33,7 @@ const JobAlert: React.FC<JobAlertProps> = ({ job }) => {
 
     setupCable();
   }, [job.channelName, job.jobId, updateByCable]);
-  
+
   switch (watchedJobStatus.status) {
     case "running":
       return (

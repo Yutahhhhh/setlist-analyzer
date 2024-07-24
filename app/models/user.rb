@@ -41,8 +41,9 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :recoverable, :trackable, :timeoutable, :validatable, :confirmable
   include DeviseTokenAuth::Concerns::User
 
-  has_many :tracks, dependent: :destroy
-  has_many :job_statuses, dependent: :destroy
+  has_many :tracks, dependent: :delete_all
+  has_many :job_statuses, dependent: :delete_all
+  has_many :setlists, dependent: :delete_all
   validates :password, presence: true
   validates :email, uniqueness: { scope: :provider }
 

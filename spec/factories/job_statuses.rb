@@ -7,8 +7,8 @@ FactoryBot.define do
     job_type { JobStatus.job_types.keys.sample }
     status { JobStatus.statuses[:running] }
     message { 'Processing...' }
+    target { nil }
     progress { 0 }
-    result { nil }
     retry_count { 0 }
     started_at { Time.current }
     finished_at { nil }
@@ -27,5 +27,10 @@ FactoryBot.define do
   factory :audio_analyze_lyric_job_status, parent: :job_status, class: 'JobStatus::AudioAnalyzeLyric' do
     job_type { :audio_analyze_lyric }
     message { 'Lyric Analyzing in progress...' }
+  end
+
+  factory :audio_analyze_genre_job_status, parent: :job_status, class: 'JobStatus::AudioAnalyzeGenre' do
+    job_type { :audio_analyze_genre }
+    message { 'Genre Analyzing in progress...' }
   end
 end

@@ -7,6 +7,12 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
   skip_forgery_protection
 
+  def render_validation_error(resource = nil)
+    json = { status: 400, message: '入力エラーです。' }
+    json[:error_messages] = resource.error_messages if resource
+    render json:, status: :bad_request
+  end
+
   private
 
   def restore_session

@@ -9,10 +9,10 @@
 #  job_type(0: 指定なし, 10: 音楽ジャンル, 20: 音楽解析, 30: 歌詞解析) :integer          default("audio_genre_train"), not null
 #  message(メッセージ（エラーメッセージや進捗など）)                   :text(65535)
 #  progress(進捗)                                                      :integer          default(0), not null
-#  result(結果や出力内容)                                              :text(65535)
 #  retry_count(再試行回数)                                             :integer          default(0)
 #  started_at(開始時刻)                                                :datetime
 #  status(0: 実行中, 1: 完了, 2: 失敗)                                 :integer          default("running"), not null
+#  target(対象)                                                        :json
 #  created_at                                                          :datetime         not null
 #  updated_at                                                          :datetime         not null
 #  job_id(一意の識別子)                                                :string(255)      not null
@@ -26,6 +26,17 @@
 class JobStatus < ApplicationRecord
   belongs_to :user
   enum status: { running: 0, completed: 1, failed: 2 }
-  enum job_type: { not_specified: 0, audio_genre_train: 10, audio_analyze: 20, audio_analyze_lyric: 30 }
+  enum job_type: {
+    not_specified: 0,
+    audio_genre_train: 10,
+    audio_analyze: 20,
+    audio_analyze_lyric: 30,
+    audio_analyze_genre: 40
+  }
   validates :job_id, presence: true, uniqueness: { case_sensitive: false }
+
+  def self.latest_running_job(job_type)
+    latest_job = where(job_type:).order(created_at: :desc).first
+    latest_job&.running? ? latest_job : nil
+  end
 end

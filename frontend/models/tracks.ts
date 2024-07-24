@@ -1,5 +1,37 @@
 import Model from "@/models/model";
 
+export interface ITrackPhrase {
+  id: number;
+  phrase: string;
+  startTime: number;
+  endTime: number;
+}
+
+export interface IRecommendWeight {
+  genre?: number;
+  tempo?: number;
+  key?: number;
+  mode?: number;
+  valence?: number;
+  time_signature?: number;
+  energy?: number;
+  acousticness?: number;
+  spectral_flatness?: number;
+  loudness?: number;
+}
+
+export const RECOMMEND_WEIGHT_FORMS: { key: keyof IRecommendWeight, label: string }[]  = [
+  { key: 'genre', label: 'ジャンル' },
+  { key: 'tempo', label: 'BPM' },
+  { key: 'key', label: 'キー' },
+  { key: 'mode', label: '調' },
+  { key: 'valence', label: '明るさ' },
+  { key: 'time_signature', label: '拍子' },
+  { key: 'energy', label: 'エネルギー' },
+  { key: 'acousticness', label: 'アコースティック' },
+  { key: 'spectral_flatness', label: 'スペクトル' }
+]
+
 export interface ITrack {
   id: number;
   title: string;
@@ -27,6 +59,10 @@ export interface ITrack {
   timeSignature: number;
   valence: number;
   url: string;
+  md5: string;
+  // リレーション
+  phrases: ITrackPhrase[];
+  playOrder: number;
 }
 
 export default class Track extends Model {
@@ -57,6 +93,10 @@ export default class Track extends Model {
   timeSignature: number = 0;
   valence: number = 0;
   url: string = '';
+  md5: string = '';
+  // リレーション
+  playOrder: number = 0;
+  phrases: ITrackPhrase[] = [];
   // frontend
   isChecked: boolean = false;
 
@@ -65,46 +105,25 @@ export default class Track extends Model {
     this.assignValues(initValues);
   }
 
-  toParams(): ITrack {
-    return {
-      id: this.id,
-      title: this.title,
-      url: this.url,
-      artist: this.artist,
-      album: this.album,
-      year: this.year,
-      coverImageUrl: this.coverImageUrl,
-      coverMimeType: this.coverMimeType,
-      acousticness: this.acousticness,
-      spectralContrast: this.spectralContrast,
-      duration: this.duration,
-      energy: this.energy,
-      genre: this.genre,
-      spectralFlatness: this.spectralFlatness,
-      key: this.key,
-      spectralBandwidth: this.spectralBandwidth,
-      loudness: this.loudness,
-      lyrics: this.lyrics,
-      measure: this.measure,
-      mode: this.mode,
-      name: this.name,
-      path: this.path,
-      mfcc: this.mfcc,
-      tempo: this.tempo,
-      timeSignature: this.timeSignature,
-      valence: this.valence
-    };
-  }
-
   get topCell(): string {
     return this.title || this.name;
   }
 
   get underCell(): string {
-    return [this.album, this.genre].filter((v) => v).join(' - ');
+    return [this.album, this.genre, this.tempo].filter((v) => v).join(' - ');
   }
 
   get hasLyrics(): boolean {
     return !!this.lyrics;
+  }
+
+  get uniqPhrases(): ITrackPhrase[] {
+    const uniquePhraseMap = new Map<string, ITrackPhrase>();
+    this.phrases.forEach(phrase => {
+      if (!uniquePhraseMap.has(phrase.phrase)) {
+        uniquePhraseMap.set(phrase.phrase, phrase);
+      }
+    });
+    return Array.from(uniquePhraseMap.values());
   }
 }

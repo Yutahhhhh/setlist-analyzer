@@ -4,6 +4,12 @@ export type TrackSearchParams = {
   filename: string;
   extensions: string;
   genres?: string;
-  isAllTracks?: boolean;
   hasLyricTrack?: boolean;
+  tempoRange?: number[];
+}
+
+export type AudioSearchParams = {
+  filename: string;
+  extensions: string;
+  isAllTracks: boolean;
 }

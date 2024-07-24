@@ -82,10 +82,7 @@ def get_audio_mime_type(file_path):
 
 def extract_features(file_path):
     try:
-        y, sr = librosa.load(file_path, sr=None)
-
-        if y.size == 0:  # ファイルが空か損傷している場合
-            return None
+        y, sr = librosa.load(file_path, sr=22050)
         
         # n_fftが信号長より大きい場合には、信号をゼロパディングしてn_fftに合わせる
         n_fft = 1024

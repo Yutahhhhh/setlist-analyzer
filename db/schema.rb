@@ -20,7 +20,7 @@ ActiveRecord::Schema[7.1].define(version: 0) do
     t.text "message", comment: "メッセージ（エラーメッセージや進捗など）"
     t.datetime "started_at", comment: "開始時刻"
     t.datetime "finished_at", comment: "終了時刻"
-    t.text "result", comment: "結果や出力内容"
+    t.json "target", comment: "対象"
     t.integer "retry_count", default: 0, comment: "再試行回数"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

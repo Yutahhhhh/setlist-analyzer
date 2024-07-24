@@ -13,12 +13,15 @@ Rails.application.routes.draw do
     resources :audios, only: [:index]
     resources :genre_trains, only: [:create]
     resources :job_statuses, only: [:index]
-    resources :tracks, only: %i[index destroy] do
+    resources :tracks, only: %i[index] do
       post :analyze, on: :collection
       post :analyze_lyrics, on: :collection
+      post :analyze_genre, on: :collection
       get :genres, on: :collection
+      get :recommend, on: :collection
+      delete :destroy_multiple, on: :collection
     end
-    resources :setlists, only: %i[index create update destroy]
+    resources :setlists, only: %i[index create update destroy show]
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

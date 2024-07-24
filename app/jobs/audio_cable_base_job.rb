@@ -20,7 +20,7 @@ class AudioCableBaseJob
 
   def process_audio_files_in_batches(audio_files, job_status)
     channel_id = "#{self.class::CHANNEL_PREFIX}_#{job_status.job_id}"
-    files_per_batch = self.class::FILES_PER_BATCH
+    files_per_batch = self.class::FILES_PER_BATCH || audio_files.count
     total_batches = (audio_files.count.to_f / files_per_batch).ceil
 
     audio_files.each_slice(files_per_batch).with_index(1) do |files, batch_index|

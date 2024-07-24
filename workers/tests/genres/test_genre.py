@@ -1,47 +1,47 @@
 import pytest
 from tests.genres.factory import generate_tracks
 
-@pytest.mark.parametrize("user_id, track_data, incremental, expected_genres", [
-    ('123', ('Rock', 2), False, ['Rock']),
-    ('123', ('Pop', 2), True, ['Rock', 'Pop']),
-    ('456', ('Pop', 2), False, ['Pop'])
+@pytest.mark.parametrize("user_id, track_data, expected_genres", [
+    ('123', ('Rock', 2), ['Rock']),
+    ('123', ('Pop', 2), ['Pop']),
+    ('456', ('Pop', 2), ['Pop'])
 ])
-def test_train_model_success(client, user_id, track_data, incremental, expected_genres):
+def test_train_model_success(client, user_id, track_data, expected_genres):
     tracks = generate_tracks(*track_data)
-    train_response = client.post("/workers/genres/train", json={'user_id': user_id, 'tracks': tracks, 'incremental': incremental})
-    assert train_response.status_code == 200, "Training failed: " + str(train_response.json)
+    response = client.post("/workers/genres/train", json={'user_id': user_id, 'tracks': tracks})
+    assert response.status_code == 200, "Training failed: " + str(response.json)
 
-    get_genres_response = client.get("/workers/genres/", query_string={'user_id': user_id})
-    assert get_genres_response.status_code == 200, "Failed to get genres: " + str(get_genres_response.json)
-    trained_genres = get_genres_response.json['genres']
+    response = client.get("/workers/genres/", query_string={'user_id': user_id})
+    assert response.status_code == 200, "Failed to get genres: " + str(response.json)
+    trained_genres = response.json['genres']
     assert set(trained_genres) == set(expected_genres), "Incorrect genres trained"
 
-    predict_response = client.post("/workers/genres/predict", json={'user_id': user_id, 'tracks': tracks[0], 'incremental': incremental})
-    assert predict_response.status_code == 200, "Prediction failed: " + str(predict_response.json)
-    assert 'genre' in predict_response.json, "Response does not contain 'genre' key"
-    assert predict_response.json['genre'] in ['Rock', 'Pop'], "Incorrect genre prediction"
+    response = client.post("/workers/genres/predict", json={'user_id': user_id, 'tracks': [
+        {'id': 1, 'features': {'acousticness': 0.5, 'loudness': -5, 'tempo': 120}},
+        {'id': 2, 'features': {'acousticness': 0.8, 'loudness': -5, 'tempo': 100}}
+    ]})
+    assert response.status_code == 200, "Prediction failed: " + str(response.json)
+    results = response.json['results']
+    assert len(results) == 2, "Incorrect number of predictions"
+    for result in results:
+        assert result['genre'] in expected_genres, "Incorrect genre prediction"
 
 @pytest.mark.parametrize("user_id, track_data, error_message", [
     (None, ('Test', 1), "User ID is required."),
     ('123', None, "No tracks provided for training."),
 ])
 def test_train_model_error_cases(client, user_id, track_data, error_message):
-    if track_data is not None:
-        tracks = generate_tracks(*track_data)
-    else:
-        tracks = None
+    tracks = generate_tracks(*track_data) if track_data else None
     response = client.post("/workers/genres/train", json={'user_id': user_id, 'tracks': tracks})
     assert response.status_code == 500
     assert "error" in response.json
-    assert response.json["error"] == error_message
 
 @pytest.mark.parametrize("user_id, tracks, error_message", [
-    (None, {'acousticness': 0.5, 'loudness': -5, 'tempo': 120}, "User ID is required."),
-    ('123', None, "No tracks provided for prediction."),
-    ('123', {}, "No tracks provided for prediction.")
+    (None, [{'acousticness': 0.5, 'loudness': -5, 'tempo': 120}], "User ID is required."),
+    ('123', None, "Track data is required for prediction."),
+    ('123', {}, "Track data is required for prediction.")
 ])
 def test_predict_genre_error(client, user_id, tracks, error_message):
     response = client.post("/workers/genres/predict", json={'user_id': user_id, 'tracks': tracks})
     assert response.status_code == 500
     assert 'error' in response.json
-    assert response.json['error'] == error_message

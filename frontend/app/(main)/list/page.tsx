@@ -1,6 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
 import TrackTable from "@/components/tracks/TrackTable";
-import { useAudio } from "@/hooks/useTrack";
 import {
   Container,
   CircularProgress,
@@ -17,33 +17,33 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTrackStore } from "@/store/useTrackStore";
 import { FILE_EXTENTIONS } from "@/constants/common";
 import { useJobStore } from "@/store/useJobStore";
 import { startAudioAnalysis } from "@/services/trackApi";
-import { useRouter, useSearchParams } from "next/navigation";
-import { TrackSearchParams } from "@/types/common";
-import { buildURL } from "@/utils/RouterUtil";
+import { getAudios } from "@/services/audioApi";
+import { AudioSearchParams } from "@/types/common";
+import Track from "@/models/tracks";
+import { useTrackTableStore } from "@/store/useTrackTableStore";
 
-export default function UnAnalyzed() {
+export default function List() {
   const router = useRouter();
   const { unshiftJob } = useJobStore();
-  const params = useSearchParams();
-  const [searchParams, setSearchParams] = useState<TrackSearchParams>({
-    page: (params.get("page") || 1) as number,
-    per: (params.get("per") || 10) as number,
-    filename: (params.get("filename") || "") as string,
-    genres: (params.get("genres") ? params.getAll("genres").join(",") : "") as string,
-    extensions: (params.get("extensions")
-      ? params.getAll("extensions").join(",")
-      : "") as string,
-    isAllTracks: params.get("isAllTracks") === "true",
-  });
-  const [formParams, setFormParams] = useState<TrackSearchParams>(searchParams);
-  const { currentPage, totalItemCount, isLoading, error } =
-    useAudio(searchParams);
-  const tracks = useTrackStore((state) => state.tracks);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalItemCount, setTotalItemCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [searchParams, setSearchParams] = useState<AudioSearchParams>({
+    filename: "",
+    extensions: "",
+    isAllTracks: false,
+  });;
+  const { tracks, setTracks } = useTrackStore();
+
+  useEffect(() => {
+    setTracks([]);
+  }, [router, setTracks]);
 
   if (isLoading) {
     return (
@@ -56,7 +56,7 @@ export default function UnAnalyzed() {
   if (error) {
     return (
       <Container>
-        <Typography color="error">エラー: {error.message}</Typography>
+        <Typography color="error">エラー: {error?.message}</Typography>
       </Container>
     );
   }
@@ -64,41 +64,36 @@ export default function UnAnalyzed() {
   const handleAnalyze = async () => {
     try {
       if (!confirm("検索条件で登録しますか？")) return;
+      setIsLoading(true);
       const jobStatus = await startAudioAnalysis({
-        page: 1,
-        per: formParams.per,
-        filename: formParams.filename,
-        extensions: formParams.extensions,
-        isAllTracks: formParams.isAllTracks,
+        filename: searchParams.filename,
+        extensions: searchParams.extensions,
+        isAllTracks: searchParams.isAllTracks,
       });
       unshiftJob(jobStatus);
     } catch (error) {
       console.error("Failed to fetch audio directory:", error);
+      setError(error as Error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSearch = (params?: {
-    page?: number;
-    per?: number;
-    arrExts?: string[];
-    arrGenres?: string[];
-  }) => {
-    const requestParams: TrackSearchParams = {
-      page: params?.page || 1,
-      per: params?.per || formParams.per,
-      filename: formParams.filename,
-      genres: !!params?.arrGenres
-        ? params.arrGenres.join(",")
-        : formParams.genres,
-      extensions: !!params?.arrExts
-        ? params.arrExts.join(",")
-        : formParams.extensions,
-      isAllTracks: formParams.isAllTracks,
-    };
-    const url = buildURL("/list", requestParams);
-    router.push(url);
-    setSearchParams(requestParams);
+  const handleSearch = async () => {
+    try {
+      setIsLoading(true);
+      const { tracks, currentPage, totalItemCount } = await getAudios(searchParams)
+      setTracks(tracks.map((t) => new Track(t)));
+      setCurrentPage(currentPage);
+      setTotalItemCount(totalItemCount);
+    } catch (error) {
+      console.error("Failed to fetch audio directory:", error);
+      setError(error as Error);
+      throw error
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -107,9 +102,9 @@ export default function UnAnalyzed() {
         <TextField
           label="ファイル名"
           variant="outlined"
-          value={formParams.filename}
+          value={searchParams.filename}
           onChange={(e) => {
-            setFormParams({ ...formParams, filename: e.target.value });
+            setSearchParams({ ...searchParams, filename: e.target.value });
           }}
           sx={{ minWidth: 220 }}
         />
@@ -118,11 +113,11 @@ export default function UnAnalyzed() {
           <Select
             labelId="file-extension-label"
             multiple
-            value={formParams.extensions.split(",").filter(Boolean)}
+            value={searchParams.extensions.split(",").filter(Boolean)}
             onChange={(e) => {
               const extensions = e.target.value as string[];
-              setFormParams({
-                ...formParams,
+              setSearchParams({
+                ...searchParams,
                 extensions: extensions.join(",") || "",
               });
             }}
@@ -145,9 +140,12 @@ export default function UnAnalyzed() {
         <FormControlLabel
           control={
             <Switch
-              checked={formParams.isAllTracks as boolean}
+              checked={searchParams.isAllTracks as boolean}
               onChange={(e) => {
-                setFormParams({ ...formParams, isAllTracks: e.target.checked });
+                setSearchParams({
+                  ...searchParams,
+                  isAllTracks: e.target.checked,
+                });
               }}
             />
           }
@@ -164,14 +162,9 @@ export default function UnAnalyzed() {
         tracks={tracks}
         totalItemCount={totalItemCount}
         currentPage={currentPage}
-        per={formParams.per as number}
-        page={formParams.page as number}
-        handleChangePage={(_, newPage) => {
-          handleSearch({ page: Number(newPage) });
-        }}
-        handleChangeRowsPerPage={(event) => {
-          handleSearch({ per: Number(event.target.value) });
-        }}
+        per={totalItemCount}
+        page={1}
+        tableHeight={600}
       />
     </Container>
   );

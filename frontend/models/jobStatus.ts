@@ -1,6 +1,6 @@
 import Model from "@/models/model";
 
-const jobTypes = ['audio_genre_train', 'audio_analyze', 'audio_analyze_lyric', ''] as const;
+const jobTypes = ['audio_genre_train', 'audio_analyze', 'audio_analyze_lyric', 'audio_analyze_genre', ''] as const;
 const statesTypes = ['running', 'success', 'failed', ''] as const;
 export type JobType = typeof jobTypes[number];
 export type JobStatusState = typeof statesTypes[number];
@@ -13,7 +13,6 @@ export interface IJobStatus {
   status: JobStatusState;
   startedAt: string;
   finishedAt: string;
-  result: string;
   message: string;
   retryCount: number;
 }
@@ -26,7 +25,6 @@ export default class JobStatus extends Model {
   status: string = '';
   startedAt: Date | null = null;
   finishedAt: Date | null = null;
-  result: string = '';
   message: string = '';
   retryCount: number = 0;
 
@@ -59,6 +57,8 @@ export default class JobStatus extends Model {
     switch (this.jobType) {
       case 'audio_genre_train':
         return 'AudioGenreTrainChannel';
+      case 'audio_analyze_genre':
+        return 'AudioAnalyzeGenreChannel';
       case 'audio_analyze':
         return 'AudioAnalyzeChannel';
       case 'audio_analyze_lyric':
@@ -89,6 +89,8 @@ export default class JobStatus extends Model {
         return '楽曲登録';
       case 'audio_analyze_lyric':
         return '歌詞解析';
+      case 'audio_analyze_genre':
+        return 'ジャンル解析';
       default:
         return '';
     }

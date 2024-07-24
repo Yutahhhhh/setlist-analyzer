@@ -5,7 +5,6 @@
 
 require 'setlist_tracks.schema'
 require 'setlists.schema'
-require 'track_transitions.schema'
 require 'tracks.schema'
 require 'users.schema'
 require 'job_statuses.schema'

@@ -14,6 +14,17 @@ FactoryBot.define do
     audio_mime_type { AudioUtil::EXTENSION_TO_MIME_TYPE_MAP[File.extname(path)] }
     duration { rand(200..300) }
 
+    # Audio features
+    tempo { 0 }
+    key { 0 }
+    mode { 0 }
+    valence { 0 }
+    time_signature { 0 }
+    energy { 0 }
+    acousticness { 0 }
+    spectral_flatness { 0 }
+    loudness { 0 }
+
     trait :with_cover_image do
       cover_image { Rack::Test::UploadedFile.new(Rails.root.join('fixtures/test.png').to_s) }
       cover_mime_type { 'image/png' }
@@ -24,7 +35,7 @@ FactoryBot.define do
       extension { 'mp3' }
     end
 
-    factory :track_with_phrases do
+    trait :with_phrases do
       after(:create) do |track|
         create_list(:track_phrase, 5, track:)
       end

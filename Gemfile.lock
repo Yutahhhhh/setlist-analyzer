@@ -377,6 +377,7 @@ GEM
     ruby-progressbar (1.13.0)
     ruby-vips (2.2.1)
       ffi (~> 1.12)
+    rubyzip (2.3.2)
     shoulda-matchers (6.2.0)
       activesupport (>= 5.2.0)
     sidekiq (7.2.4)
@@ -477,6 +478,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rails
   rubocop-rspec
+  rubyzip
   shoulda-matchers
   sidekiq
   simplecov

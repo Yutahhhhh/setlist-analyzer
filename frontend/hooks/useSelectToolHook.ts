@@ -4,7 +4,7 @@ import Track, { IRecommendWeight } from '@/models/tracks';
 import { getTracks, getRecommendTracks } from '@/services/trackApi';
 import { TrackSearchParams } from '@/types/common';
 import { useTrackStore } from '@/store/useTrackStore';
-import { useTrack } from '@/hooks/useTrack';
+import { useTrack } from '@/hooks/useTrackHook';
 
 interface UseSelectToolProps {
   initialSearchParams: TrackSearchParams;

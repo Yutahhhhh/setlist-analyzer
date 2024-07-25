@@ -1,5 +1,5 @@
 import { axiosWithAuth, axiosAudio } from "@/services/baseAxiosInstance";
-import { PageTrackList, TrackListRequestParams } from "@/interfaces/tracks";
+import { PageTrackList } from "@/interfaces/tracks";
 import { AudioSearchParams } from "@/types/common";
 
 const CONTROLLER_PATH = '/audios';
@@ -20,6 +20,21 @@ export const findAudioUrl = async (path: string): Promise<string> => {
     throw error;
   }
 };
+
+export const downloadTracks = async (files: string[]): Promise<string> => {
+  const axiosInstance = axiosAudio();
+  try {
+    const response = await axiosInstance.get(`${CONTROLLER_PATH}/download`, {
+      responseType: 'blob',
+      params: { files }
+    });
+
+    return URL.createObjectURL(new Blob([response.data]));
+  } catch (error) {
+    console.error('Failed to download tracks:', error);
+    throw error;
+  }
+}
 
 export const getAudios = async ({
   filename,

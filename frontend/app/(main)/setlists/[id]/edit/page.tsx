@@ -7,7 +7,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ISetList } from "@/models/setlists";
-import { useSetList } from "@/hooks/useSetList";
+import { useSetList } from "@/hooks/useSetlistHook";
 import SetListBaseForm from "@/components/setlists/BaseForm";
 
 export default function EditSetlist() {

@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
+import CopyIcon from "@mui/icons-material/FileCopy";
 import LyricsModal from "@/components/tracks/LyricsModal";
 import Track from "@/models/tracks";
 import theme from "@/plugins/theme";
@@ -147,8 +148,34 @@ const ToSelectItemContent = (props: SelectProps) => (
   </>
 );
 
-export { MultiSelectItemContent, FromSelectItemContent, ToSelectItemContent, BaseItemContent };
-  function useCollback(arg0: (e: React.ChangeEvent<HTMLInputElement>) => void, arg1: number[]) {
-    throw new Error("Function not implemented.");
-  }
+const ShowItemContent = (props: CommonProps) => (
+  <>
+    <TableCell align="center" sx={singleCellStyle}>
+      <Button
+        onClick={(event) => {
+          event.stopPropagation();
+          navigator.clipboard
+            .writeText(props.track.topCell)
+            .then(() => {
+              console.info("Path copied to clipboard!", props.track.name);
+            })
+            .catch((err) => {
+              console.error("Failed to copy path: ", err);
+            });
+        }}
+      >
+        <CopyIcon />
+      </Button>
+    </TableCell>
+    <BaseItemContent {...props} cellStyle={singleCellStyle} />
+  </>
+);
+
+export {
+  MultiSelectItemContent,
+  FromSelectItemContent,
+  ToSelectItemContent,
+  BaseItemContent,
+  ShowItemContent,
+};
 

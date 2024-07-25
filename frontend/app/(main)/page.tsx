@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useTrackStore } from "@/store/useTrackStore";
-import { useTrack } from "@/hooks/useTrack";
+import { useTrack } from "@/hooks/useTrackHook";
 import { TrackSearchParams } from "@/types/common";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -150,7 +150,7 @@ export default function Home() {
       if (!confirm("検索条件でジャンルを解析しますか？")) return;
       const jobStatus = await startAudioAnalyzeGenreBySearch(searchParams);
       unshiftJob(jobStatus);
-      setAudioAnalyzeLyricsJob(jobStatus);
+      setAudioAnalyzeGenreJob(jobStatus);
       resetSelectedTracks();
     } catch (error) {
       console.error("Failed to fetch audio directory:", error);
@@ -163,7 +163,7 @@ export default function Home() {
       if (!confirm("選択中の曲のジャンルを解析しますか？")) return;
       const jobStatus = await startAudioAnalyzeGenre(selectedIds);
       unshiftJob(jobStatus);
-      setAudioAnalyzeLyricsJob(jobStatus);
+      setAudioAnalyzeGenreJob(jobStatus);
       resetSelectedTracks();
     } catch (error) {
       console.error("Failed to fetch audio directory:", error);

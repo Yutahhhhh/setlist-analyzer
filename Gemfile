@@ -82,6 +82,9 @@ gem 'devise_token_auth'
 gem 'carrierwave'
 gem 'carrierwave-base64'
 
+# Download
+gem 'rubyzip'
+
 group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'database_rewinder'

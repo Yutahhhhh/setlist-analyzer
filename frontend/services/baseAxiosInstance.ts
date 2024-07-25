@@ -24,10 +24,7 @@ export const axiosWithAuth = (): AxiosInstance => {
 
 export const axiosAudio = (): AxiosInstance => {
   const axiosAudioInstance: AxiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-    headers: {
-      'Content-Type': 'audio/mpeg',
-    }
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL
   });
 
   return axiosAudioInstance;

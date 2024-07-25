@@ -10,7 +10,7 @@ import {
   RecommendToolbar,
 } from "@/components/tracks/tables/TableToolbar";
 import BaseTrackSearchForm from "@/components/tracks/BaseTrackSearchForm";
-import { useSelectTool } from "@/hooks/useSelectTool";
+import { useSelectTool } from "@/hooks/useSelectToolHook";
 
 interface SelectToolProps {
   selectedTracks: Track[];

@@ -20,13 +20,13 @@ import {
   MultiSelectItemContent,
   FromSelectItemContent,
   ToSelectItemContent,
+  ShowItemContent,
   BaseItemContent,
 } from "@/components/tracks/tables/ItemContent";
 import {
   MultiSelectHeader, SelectHeader, BaseHeader
 } from "@/components/tracks/tables/TableHeaders";
 import TableFooter from "@/components/tracks/tables/TableFooter";
-import { useTrackTableStore } from "@/store/useTrackTableStore";
 
 const Scroller = forwardRef<HTMLDivElement, any>((props, ref) => (
   <TableContainer component={Paper} {...props} ref={ref} />
@@ -37,7 +37,7 @@ interface TrackTableProps extends PageTrackList {
   per: number;
   page: number;
   tracks: Track[];
-  tableType?: "nomal" | "multiSelect" | "fromSelect" | "toSelect";
+  tableType?: "nomal" | "show" | "multiSelect" | "fromSelect" | "toSelect";
   small?: boolean;
   recommendTarget?: Track | null;
   handleChangePage?: (
@@ -89,6 +89,8 @@ const TrackTable = ({
             case "fromSelect":
               return <SelectHeader />;
             case "toSelect":
+              return <SelectHeader />;
+            case "show":
               return <SelectHeader />;
             default:
               return <BaseHeader />;
@@ -163,6 +165,14 @@ const TrackTable = ({
                   isPlaying={currentTrack?.path === track.path && isPlaying}
                   togglePlayPause={() => handlePlayPause(track)}
                   handleCustomAction={handleCustomAction}
+                />
+              );
+            case "show":
+              return (
+                <ShowItemContent
+                  track={track}
+                  isPlaying={currentTrack?.path === track.path && isPlaying}
+                  togglePlayPause={() => handlePlayPause(track)}
                 />
               );
             default:

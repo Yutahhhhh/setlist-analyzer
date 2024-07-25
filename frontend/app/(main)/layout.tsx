@@ -1,7 +1,8 @@
 "use client";
+import { Suspense } from "react";
 import ResponsiveDrawer from "@/components/ResponsiveDrawer";
-import { useGenre } from "@/hooks/useGenre";
-import { useJobStatus } from "@/hooks/useJobStatus";
+import { useGenre } from "@/hooks/useGenreHook";
+import { useJobStatus } from "@/hooks/useJobStatusHook";
 
 export default function MainLayout({
   children,
@@ -12,6 +13,8 @@ export default function MainLayout({
   useGenre();
   
   return (
-    <ResponsiveDrawer>{children}</ResponsiveDrawer>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResponsiveDrawer>{children}</ResponsiveDrawer>
+    </Suspense>
   );
 }

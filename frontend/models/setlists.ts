@@ -49,4 +49,8 @@ export default class SetList extends Model {
       id: this.id
     });
   }
+
+  get sortedTracks(): Track[] {
+    return this.tracks.sort((a, b) => a.playOrder - b.playOrder);
+  }
 }

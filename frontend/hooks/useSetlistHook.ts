@@ -1,5 +1,6 @@
 import SetList from "@/models/setlists";
 import { getSetLists, getSetList, deleteSetList, createSetList, updateSetList } from "@/services/setlistApi";
+import { downloadTracks } from "@/services/audioApi";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -21,6 +22,20 @@ export const useSetLists = () => {
     }
   }
 
+  const handleDownloadSetlist = async (setList: SetList) => {
+    try {
+      const files = setList.tracks.map((t) => t.path)
+      const blobUrl = await downloadTracks(files);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `${setList.name}.zip`;
+      a.click();
+    } catch (error) {
+      console.error("Failed to download setlist:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const loadSetlists = async () => {
       setIsLoading(true);
@@ -39,7 +54,8 @@ export const useSetLists = () => {
 
   return { 
     setLists, isLoading, error, 
-    handleDeleteSetlist 
+    handleDeleteSetlist,
+    handleDownloadSetlist
   };
 };
 

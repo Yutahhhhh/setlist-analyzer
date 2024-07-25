@@ -31,6 +31,7 @@ Rails.application.routes.draw do
 
   # 音楽ファイル取得用
   get 'audios/find_audio', to: 'audios#find_audio'
+  get 'audios/download', to: 'audios#download'
 
   # Defines the root path route ("/")
   # root "posts#index"

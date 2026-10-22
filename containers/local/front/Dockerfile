@@ -1,5 +1,5 @@
 # Dockerfile for Next.js
-FROM node:20-slim
+FROM node:22.23.4-slim
 
 WORKDIR /usr/src/app
 
